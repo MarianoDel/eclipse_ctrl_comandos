@@ -143,25 +143,15 @@ int main(void)
 //		}
 //	}
 
-//	while(1)
-//	{
-//		if (OUTPUT_ENABLE)
-//		{
-//			Update_Buck(50);
-//			Update_Boost(50);
-//		}
-//		else
-//		{
-//			Update_Buck(0);
-//			Update_Boost(0);
-//		}
-//		if (LEDV)
-//			LEDV_OFF;
-//		else
-//			LEDV_ON;
-//
-//		Wait_ms(300);
-//	}
+	while(1)
+	{
+		if (LED)
+			LED_OFF;
+		else
+			LED_ON;
+
+		Wait_ms(300);
+	}
 
 
 	//--- Main loop ---//

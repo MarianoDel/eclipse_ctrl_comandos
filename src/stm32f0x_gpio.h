@@ -23,7 +23,7 @@
 //--- Exported constants ---//
 //--- Exported macro ---//
 #define GPIOA_ENABLE
-#define GPIOB_ENABLE
+//#define GPIOB_ENABLE
 //#define GPIOF_ENABLE
 //#define WITH_EXTI
 
