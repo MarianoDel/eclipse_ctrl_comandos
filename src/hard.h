@@ -22,7 +22,7 @@
 
 #ifdef VER_1_0
 //GPIOA pin0
-#define S1 ((GPIOB->IDR & 0x0001) == 0)
+#define S1 ((GPIOA->IDR & 0x0001) == 0)
 
 //GPIOA pin1
 #define LED ((GPIOA->ODR & 0x0002) != 0)
@@ -37,7 +37,7 @@
 #define TX_CODE_OFF GPIOA->BSRR = 0x00080000
 
 //GPIOA pin4
-#define S2 ((GPIOB->IDR & 0x0010) == 0)
+#define S2 ((GPIOA->IDR & 0x0010) == 0)
 
 //GPIOA pin5
 //GPIOA pin6

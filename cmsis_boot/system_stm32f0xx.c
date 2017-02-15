@@ -161,32 +161,32 @@ void SystemInit (void)
   /* Set HSION bit */
   RCC->CR |= (uint32_t)0x00000001;
 
-  /* Reset SW[1:0], HPRE[3:0], PPRE[2:0], ADCPRE and MCOSEL[2:0] bits */
-  RCC->CFGR &= (uint32_t)0xF8FFB80C;
-  
-  /* Reset HSEON, CSSON and PLLON bits */
-  RCC->CR &= (uint32_t)0xFEF6FFFF;
-
-  /* Reset HSEBYP bit */
-  RCC->CR &= (uint32_t)0xFFFBFFFF;
-
-  /* Reset PLLSRC, PLLXTPRE and PLLMUL[3:0] bits */
-  RCC->CFGR &= (uint32_t)0xFFC0FFFF;
-
-  /* Reset PREDIV1[3:0] bits */
-  RCC->CFGR2 &= (uint32_t)0xFFFFFFF0;
-
-  /* Reset USARTSW[1:0], I2CSW, CECSW and ADCSW bits */
-  RCC->CFGR3 &= (uint32_t)0xFFFFFEAC;
-
-  /* Reset HSI14 bit */
-  RCC->CR2 &= (uint32_t)0xFFFFFFFE;
+//  /* Reset SW[1:0], HPRE[3:0], PPRE[2:0], ADCPRE and MCOSEL[2:0] bits */
+//  RCC->CFGR &= (uint32_t)0xF8FFB80C;
+//
+//  /* Reset HSEON, CSSON and PLLON bits */
+//  RCC->CR &= (uint32_t)0xFEF6FFFF;
+//
+//  /* Reset HSEBYP bit */
+//  RCC->CR &= (uint32_t)0xFFFBFFFF;
+//
+//  /* Reset PLLSRC, PLLXTPRE and PLLMUL[3:0] bits */
+//  RCC->CFGR &= (uint32_t)0xFFC0FFFF;
+//
+//  /* Reset PREDIV1[3:0] bits */
+//  RCC->CFGR2 &= (uint32_t)0xFFFFFFF0;
+//
+//  /* Reset USARTSW[1:0], I2CSW, CECSW and ADCSW bits */
+//  RCC->CFGR3 &= (uint32_t)0xFFFFFEAC;
+//
+//  /* Reset HSI14 bit */
+//  RCC->CR2 &= (uint32_t)0xFFFFFFFE;
 
   /* Disable all interrupts */
   RCC->CIR = 0x00000000;
 
   /* Configure the System clock frequency, AHB/APBx prescalers and Flash settings */
-  SetSysClock();
+//  SetSysClock();
 }
 
 /**

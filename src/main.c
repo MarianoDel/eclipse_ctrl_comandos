@@ -59,7 +59,9 @@ volatile unsigned short timer_led_error = 0;
 
 //--- FUNCIONES DEL MODULO ---//
 void TimingDelay_Decrement(void);
-
+void UpdateSwitches (void);
+unsigned char CheckS1 (void);
+unsigned char CheckS2 (void);
 
 // ------- del DMX -------
 extern void EXTI4_15_IRQHandler(void);
@@ -84,7 +86,8 @@ int main(void)
 	GPIO_Config();
 
 	//ACTIVAR SYSTICK TIMER
-	if (SysTick_Config(48000))
+	//if (SysTick_Config(48000))		//del core_cm0.h
+	if (SysTick_Config(8000))		//del core_cm0.h
 	{
 		while (1)	/* Capture error */
 		{
@@ -126,31 +129,40 @@ int main(void)
 	pote_value = 0;
 #endif
 
-	//pruebo adc contra pwm
-//	while (1)
-//	{
-//		//PROGRAMA DE PRODUCCION
-//		if (seq_ready)
-//		{
-//			seq_ready = 0;
-//			LED_ON;
-//			//pote_value = MAFilter32Circular (One_Ten_Pote, v_pote_samples, p_pote, &pote_sumation);
-//			pote_value = MAFilter32Pote (One_Ten_Pote);	//esto tarda 5.4us
-//			//pote_value = MAFilter32 (One_Ten_Pote, v_pote_samples);	//esto tarda 32.4us
-//			//pote_value = MAFilter8 (One_Ten_Pote, v_pote_samples);		//esto tarda 8.1us
-//			LED_OFF;
-//			Update_TIM3_CH1 (pote_value);
-//		}
-//	}
-
 	while(1)
 	{
-		if (LED)
-			LED_OFF;
-		else
+//		if (LED)
+//		{
+//			LED_OFF;
+//			TX_CODE_OFF;
+//		}
+//		else
+//		{
+//			LED_ON;
+//			TX_CODE_ON;
+//		}
+//
+//		Wait_ms(3);
+		if (S1)
+		{
+			TX_CODE_ON;
 			LED_ON;
+		}
+		else
+		{
+			TX_CODE_OFF;
+			LED_OFF;
+		}
 
-		Wait_ms(300);
+		if (S2)
+		{
+			TX_CODE_ON;
+			LED_ON;
+			Wait_ms(2);
+			TX_CODE_OFF;
+			LED_OFF;
+			Wait_ms(2);
+		}
 	}
 
 
@@ -595,6 +607,55 @@ int main(void)
 
 
 //--- End of Main ---//
+//unsigned char CheckS1 (void)	//cada check tiene 10ms
+//{
+//	if (s1 > SWITCHES_THRESHOLD_FULL)
+//		return S_FULL;
+//
+//	if (s1 > SWITCHES_THRESHOLD_HALF)
+//		return S_HALF;
+//
+//	if (s1 > SWITCHES_THRESHOLD_MIN)
+//		return S_MIN;
+//
+//	return S_NO;
+//}
+//
+//unsigned char CheckS2 (void)	//cada check tiene 10ms
+//{
+//	if (s1 > SWITCHES_THRESHOLD_FULL)
+//		return S_FULL;
+//
+//	if (s1 > SWITCHES_THRESHOLD_HALF)
+//		return S_HALF;
+//
+//	if (s1 > SWITCHES_THRESHOLD_MIN)
+//		return S_MIN;
+//
+//	return S_NO;
+//}
+//
+//void UpdateSwitches (void)
+//{
+//	//revisa los switches cada 10ms
+//	if (!switches_timer)
+//	{
+//		if (S1_INPUT)
+//		{
+//			if (s1 < SWITCHES_ROOF)
+//				s1++;
+//		}
+//		else if (s1 > 50)
+//			s1 -= 50;
+//		else if (s1 > 10)
+//			s1 -= 5;
+//		else if (s1)
+//			s1--;
+//
+//		switches_timer = SWITCHES_TIMER_RELOAD;
+//	}
+//}
+
 
 
 void EXTI4_15_IRQHandler(void)		//nueva detecta el primer 0 en usart Consola PHILIPS
