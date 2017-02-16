@@ -21,7 +21,8 @@
 //#include "stm32f0xx_exti.h"
 
 
-
+//--- VARIABLES EXTERNAS ---//
+volatile unsigned char led;
 
 
 //--- Private typedef ---//
@@ -182,7 +183,8 @@ void EXTI0_1_IRQHandler(void)		//nueva detecta el primer 0 en usart Consola PHIL
 	if(EXTI->PR & 0x0001)	//Line0
 	{
 		EXTI->PR |= 0x0001;
-		EXTIOff();
+		//EXTIOff();
+		led = 1;
 	}
 }
 
@@ -191,7 +193,8 @@ void EXTI4_15_IRQHandler(void)		//nueva detecta el primer 0 en usart Consola PHI
 	if(EXTI->PR & 0x0010)	//Line4
 	{
 		EXTI->PR |= 0x0010;
-		EXTIOff();
+		//EXTIOff();
+		led = 2;
 	}
 }
 #endif

@@ -33,6 +33,8 @@ volatile unsigned short timer_led_comm = 0;
 volatile unsigned short wait_ms_var = 0;
 volatile unsigned char seq_ready = 0;
 
+//para pruebas int
+volatile unsigned char led = 0;
 
 //--- VARIABLES GLOBALES ---//
 
@@ -133,6 +135,31 @@ int main(void)
 			LED_ON;
 
 		Wait_ms(300);
+	}
+
+	//Prueba interrupciones
+	EXTIOn();
+	while (1)
+	{
+		if (led == 1)
+		{
+			led = 0;
+			LED_ON;
+			Wait_ms(500);
+			LED_OFF;
+		}
+
+		if (led == 2)
+		{
+			led = 0;
+			LED_ON;
+			Wait_ms(500);
+			LED_OFF;
+			Wait_ms(500);
+			LED_ON;
+			Wait_ms(500);
+			LED_OFF;
+		}
 	}
 
 	timer_for_stop = TIMER_SLEEP;
