@@ -67,6 +67,7 @@ enum {
 
 #define SWITCHES_TIMER_RELOAD	10
 
+#define SWITCHES_ROOF			400
 #define SWITCHES_THRESHOLD_FULL	300		//3 segundos
 #define SWITCHES_THRESHOLD_HALF	100		//1 segundo
 #define SWITCHES_THRESHOLD_MIN	5		//50 ms

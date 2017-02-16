@@ -40,6 +40,10 @@ volatile unsigned short timer_standby;
 volatile unsigned char filter_timer;
 static __IO uint32_t TimingDelay;
 
+// ------- de los switches -------
+volatile unsigned short switches_timer;
+volatile unsigned char s1, s2;
+
 volatile unsigned char door_filter;
 volatile unsigned char take_sample;
 volatile unsigned char move_relay;
@@ -117,7 +121,7 @@ int main(void)
 
 	//--- COMIENZO PROGRAMA DE PRODUCCION
 
-
+	//--- Main loop ---//
 	while(1)
 	{
 //		if (LED)
@@ -132,7 +136,8 @@ int main(void)
 //		}
 //
 //		Wait_ms(3);
-		if (S1)
+		//if (S1)
+		if (CheckS1())
 		{
 			TX_CODE_ON;
 			LED_ON;
@@ -143,7 +148,8 @@ int main(void)
 			LED_OFF;
 		}
 
-		if (S2)
+		//if (S2)
+		if (CheckS2())
 		{
 			LED_ON;
 			for (i = 0; i < 10; i++)
@@ -156,15 +162,8 @@ int main(void)
 			LED_OFF;
 			Wait_ms(20);
 		}
-	}
 
-
-	//--- Main loop ---//
-	while(1)
-	{
-		//PROGRAMA DE PRODUCCION
-
-
+		UpdateSwitches ();
 
 	}	//termina while(1)
 
@@ -173,54 +172,67 @@ int main(void)
 
 
 //--- End of Main ---//
-//unsigned char CheckS1 (void)	//cada check tiene 10ms
-//{
-//	if (s1 > SWITCHES_THRESHOLD_FULL)
-//		return S_FULL;
-//
-//	if (s1 > SWITCHES_THRESHOLD_HALF)
-//		return S_HALF;
-//
-//	if (s1 > SWITCHES_THRESHOLD_MIN)
-//		return S_MIN;
-//
-//	return S_NO;
-//}
-//
-//unsigned char CheckS2 (void)	//cada check tiene 10ms
-//{
-//	if (s1 > SWITCHES_THRESHOLD_FULL)
-//		return S_FULL;
-//
-//	if (s1 > SWITCHES_THRESHOLD_HALF)
-//		return S_HALF;
-//
-//	if (s1 > SWITCHES_THRESHOLD_MIN)
-//		return S_MIN;
-//
-//	return S_NO;
-//}
-//
-//void UpdateSwitches (void)
-//{
-//	//revisa los switches cada 10ms
-//	if (!switches_timer)
-//	{
-//		if (S1_INPUT)
-//		{
-//			if (s1 < SWITCHES_ROOF)
-//				s1++;
-//		}
-//		else if (s1 > 50)
-//			s1 -= 50;
-//		else if (s1 > 10)
-//			s1 -= 5;
-//		else if (s1)
-//			s1--;
-//
-//		switches_timer = SWITCHES_TIMER_RELOAD;
-//	}
-//}
+unsigned char CheckS1 (void)	//cada check tiene 10ms
+{
+	if (s1 > SWITCHES_THRESHOLD_FULL)
+		return S_FULL;
+
+	if (s1 > SWITCHES_THRESHOLD_HALF)
+		return S_HALF;
+
+	if (s1 > SWITCHES_THRESHOLD_MIN)
+		return S_MIN;
+
+	return S_NO;
+}
+
+unsigned char CheckS2 (void)	//cada check tiene 10ms
+{
+	if (s2 > SWITCHES_THRESHOLD_FULL)
+		return S_FULL;
+
+	if (s2 > SWITCHES_THRESHOLD_HALF)
+		return S_HALF;
+
+	if (s2 > SWITCHES_THRESHOLD_MIN)
+		return S_MIN;
+
+	return S_NO;
+}
+
+
+//revisa los switches cada 10ms
+void UpdateSwitches (void)
+{
+	if (!switches_timer)
+	{
+		if (S1)
+		{
+			if (s1 < SWITCHES_ROOF)
+				s1++;
+		}
+		else if (s1 > 50)
+			s1 -= 50;
+		else if (s1 > 10)
+			s1 -= 5;
+		else if (s1)
+			s1--;
+
+		if (S2)
+		{
+			if (s2 < SWITCHES_ROOF)
+				s2++;
+		}
+		else if (s2 > 50)
+			s2 -= 50;
+		else if (s2 > 10)
+			s2 -= 5;
+		else if (s2)
+			s2--;
+
+		switches_timer = SWITCHES_TIMER_RELOAD;
+	}
+}
 
 
 
@@ -248,8 +260,8 @@ void TimingDelay_Decrement(void)
 	if (timer_standby)
 		timer_standby--;
 
-	if (take_sample)
-		take_sample--;
+	if (switches_timer)
+		switches_timer--;
 
 	if (filter_timer)
 		filter_timer--;
