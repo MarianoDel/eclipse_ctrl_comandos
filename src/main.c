@@ -89,6 +89,7 @@ int main(void)
 
 	//GPIO Configuration.
 	GPIO_Config();
+	EXTIOff();
 
 	//ACTIVAR SYSTICK TIMER
 	//if (SysTick_Config(48000))		//del core_cm0.h
@@ -185,6 +186,7 @@ int main(void)
 		//go to stop mode
 		if (!timer_for_stop)
 		{
+			EXTIOn();
 			PWR_EnterSTOPMode(PWR_Regulator_ON, PWR_STOPEntry_WFI);
 			timer_for_stop = TIMER_SLEEP;
 		}
@@ -260,15 +262,6 @@ void UpdateSwitches (void)
 
 
 
-void EXTI4_15_IRQHandler(void)		//nueva detecta el primer 0 en usart Consola PHILIPS
-{
-
-
-	if(EXTI->PR & 0x0100)	//Line8
-	{
-		EXTI->PR |= 0x0100;
-	}
-}
 
 
 void TimingDelay_Decrement(void)

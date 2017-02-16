@@ -25,7 +25,7 @@
 #define GPIOA_ENABLE
 //#define GPIOB_ENABLE
 //#define GPIOF_ENABLE
-//#define WITH_EXTI
+#define WITH_EXTI
 
 #define GPIOA_CLK (RCC->AHBENR & 0x00020000)
 #define GPIOA_CLK_ON RCC->AHBENR |= 0x00020000
@@ -46,6 +46,11 @@
 #define GPIOF_CLK (RCC->AHBENR & 0x00400000)
 #define GPIOF_CLK_ON RCC->AHBENR |= 0x00400000
 #define GPIOF_CLK_OFF RCC->AHBENR &= ~0x00400000
+
+#define SYSCFG_CLK (RCC->APB2ENR & 0x00000001)
+#define SYSCFG_CLK_ON RCC->APB2ENR |= 0x00000001
+#define SYSCFG_CLK_OFF RCC->APB2ENR &= ~0x00000001
+
 
 
 #define GPIOA_PIN0_IN 	GPIOA->IDR & 0x00000001
@@ -142,6 +147,9 @@
 void GPIO_Config(void);
 void EXTIOff (void);
 void EXTIOn (void);
+
+void EXTI0_1_IRQHandler(void);
+void EXTI4_15_IRQHandler(void);
 
 #endif //--- End ---//
 

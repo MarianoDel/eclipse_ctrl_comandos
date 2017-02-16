@@ -16,8 +16,9 @@
 /* Includes ------------------------------------------------------------------*/
 #include "gpio.h"
 #include "hard.h"
+#include "stm32f0xx.h"
 
-#include "stm32f0xx_exti.h"
+//#include "stm32f0xx_exti.h"
 
 
 
@@ -38,11 +39,6 @@
 void GPIO_Config (void)
 {
 	unsigned long temp;
-
-#ifdef WITH_EXTI
-	EXTI_InitTypeDef EXTI_InitStructure;
-	NVIC_InitTypeDef NVIC_InitStructure;
-#endif
 
 	//--- MODER ---//
 	//00: Input mode (reset state)
@@ -159,42 +155,55 @@ void GPIO_Config (void)
 #endif
 
 #ifdef WITH_EXTI
-	//EXTI_InitStructure.EXTI_Line = EXTI_Line0;
-	//EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	//EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
-	//EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-	//EXTI_Init(&EXTI_InitStructure);
-	EXTI_InitStructure.EXTI_Line = EXTI_Line8;
-	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
-	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-	EXTI_Init(&EXTI_InitStructure);
+	//Interrupt en PB8
+	if (!SYSCFG_CLK)
+		SYSCFG_CLK_ON;
 
-		//GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource12);
+	SYSCFG->EXTICR[0] = 0x00000000; //Select Port A & Pin 0 external interrupt
+	SYSCFG->EXTICR[1] = 0x00000000; //Select Port A & Pin 4 external interrupt
+	EXTI->IMR |= 0x0011; 			//Corresponding mask bit for interrupts PA4 & PA0
+	EXTI->EMR |= 0x0000; 			//Corresponding mask bit for events
+	EXTI->RTSR |= 0x0000; 			//Pin Interrupt line on rising edge
+	EXTI->FTSR |= 0x0011; 			//Pin Interrupt line on falling edge PA4 & PA0
 
-	/* Enable and set Button EXTI Interrupt to the lowest priority */
-	//NVIC_InitStructure.NVIC_IRQChannel = EXTI0_IRQn;
-	//NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
-	//NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
-	//NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_EnableIRQ(EXTI0_1_IRQn);
+	NVIC_SetPriority(EXTI0_1_IRQn, 6);
 
-	NVIC_InitStructure.NVIC_IRQChannel = EXTI4_15_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPriority = 0x0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_EnableIRQ(EXTI4_15_IRQn);
+	NVIC_SetPriority(EXTI4_15_IRQn, 6);
 
-	NVIC_Init(&NVIC_InitStructure);
 #endif
 
 }
 
+#ifdef WITH_EXTI
+void EXTI0_1_IRQHandler(void)		//nueva detecta el primer 0 en usart Consola PHILIPS
+{
+	if(EXTI->PR & 0x0001)	//Line0
+	{
+		EXTI->PR |= 0x0001;
+		EXTIOff();
+	}
+}
+
+void EXTI4_15_IRQHandler(void)		//nueva detecta el primer 0 en usart Consola PHILIPS
+{
+	if(EXTI->PR & 0x0010)	//Line4
+	{
+		EXTI->PR |= 0x0010;
+		EXTIOff();
+	}
+}
+#endif
+
 inline void EXTIOff (void)
 {
-	EXTI->IMR &= ~0x00000100;
+	EXTI->IMR &= ~0x00000011;
 }
 
 inline void EXTIOn (void)
 {
-	EXTI->IMR |= 0x00000100;
+	EXTI->IMR |= 0x00000011;
 }
 
 //--- end of file ---//
