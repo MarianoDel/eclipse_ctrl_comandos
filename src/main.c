@@ -34,7 +34,7 @@ volatile unsigned short wait_ms_var = 0;
 volatile unsigned char seq_ready = 0;
 
 //para pruebas int
-volatile unsigned char led = 0;
+//volatile unsigned char led = 0;
 
 //--- VARIABLES GLOBALES ---//
 
@@ -137,30 +137,30 @@ int main(void)
 		Wait_ms(300);
 	}
 
-	//Prueba interrupciones
-	EXTIOn();
-	while (1)
-	{
-		if (led == 1)
-		{
-			led = 0;
-			LED_ON;
-			Wait_ms(500);
-			LED_OFF;
-		}
-
-		if (led == 2)
-		{
-			led = 0;
-			LED_ON;
-			Wait_ms(500);
-			LED_OFF;
-			Wait_ms(500);
-			LED_ON;
-			Wait_ms(500);
-			LED_OFF;
-		}
-	}
+//	//Prueba interrupciones
+//	EXTIOn();
+//	while (1)
+//	{
+//		if (led == 1)
+//		{
+//			led = 0;
+//			LED_ON;
+//			Wait_ms(500);
+//			LED_OFF;
+//		}
+//
+//		if (led == 2)
+//		{
+//			led = 0;
+//			LED_ON;
+//			Wait_ms(500);
+//			LED_OFF;
+//			Wait_ms(500);
+//			LED_ON;
+//			Wait_ms(500);
+//			LED_OFF;
+//		}
+//	}
 
 	timer_for_stop = TIMER_SLEEP;
 
@@ -214,7 +214,8 @@ int main(void)
 		if (!timer_for_stop)
 		{
 			EXTIOn();
-			PWR_EnterSTOPMode(PWR_Regulator_ON, PWR_STOPEntry_WFI);
+			//PWR_EnterSTOPMode(PWR_Regulator_ON, PWR_STOPEntry_WFI);		//0.04mA
+			PWR_EnterSTOPMode(PWR_Regulator_LowPower, PWR_STOPEntry_WFI);		//0.02mA
 			timer_for_stop = TIMER_SLEEP;
 		}
 

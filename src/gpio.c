@@ -22,7 +22,7 @@
 
 
 //--- VARIABLES EXTERNAS ---//
-volatile unsigned char led;
+//volatile unsigned char led;
 
 
 //--- Private typedef ---//
@@ -178,23 +178,23 @@ void GPIO_Config (void)
 }
 
 #ifdef WITH_EXTI
-void EXTI0_1_IRQHandler(void)		//nueva detecta el primer 0 en usart Consola PHILIPS
+void EXTI0_1_IRQHandler(void)
 {
 	if(EXTI->PR & 0x0001)	//Line0
 	{
 		EXTI->PR |= 0x0001;
-		//EXTIOff();
-		led = 1;
+		EXTIOff();
+		//led = 1;
 	}
 }
 
-void EXTI4_15_IRQHandler(void)		//nueva detecta el primer 0 en usart Consola PHILIPS
+void EXTI4_15_IRQHandler(void)
 {
 	if(EXTI->PR & 0x0010)	//Line4
 	{
 		EXTI->PR |= 0x0010;
-		//EXTIOff();
-		led = 2;
+		EXTIOff();
+		//led = 2;
 	}
 }
 #endif
