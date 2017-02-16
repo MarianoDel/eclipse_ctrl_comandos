@@ -38,7 +38,6 @@ volatile unsigned char seq_ready = 0;
 // ------- de los timers -------
 volatile unsigned short timer_standby;
 volatile unsigned char filter_timer;
-static __IO uint32_t TimingDelay;
 
 // ------- de los switches -------
 volatile unsigned short switches_timer;
@@ -120,6 +119,15 @@ int main(void)
 #endif
 
 	//--- COMIENZO PROGRAMA DE PRODUCCION
+	for (i = 0; i < 6; i++)
+	{
+		if (LED)
+			LED_OFF;
+		else
+			LED_ON;
+
+		Wait_ms(300);
+	}
 
 	//--- Main loop ---//
 	while(1)
@@ -249,11 +257,6 @@ void EXTI4_15_IRQHandler(void)		//nueva detecta el primer 0 en usart Consola PHI
 
 void TimingDelay_Decrement(void)
 {
-	if (TimingDelay != 0x00)
-	{
-		TimingDelay--;
-	}
-
 	if (wait_ms_var)
 		wait_ms_var--;
 
@@ -263,8 +266,8 @@ void TimingDelay_Decrement(void)
 	if (switches_timer)
 		switches_timer--;
 
-	if (filter_timer)
-		filter_timer--;
+//	if (filter_timer)
+//		filter_timer--;
 
 	if (timer_led_error)
 		timer_led_error--;
