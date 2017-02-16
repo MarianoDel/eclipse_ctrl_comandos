@@ -66,7 +66,9 @@
   #define __NVIC_PRIO_BITS    2               /*!< standard definition for NVIC Priority Bits */
 #endif
 
-
+#ifndef __GNUC__
+	#define __GNUC__
+#endif
 
 
 /**
