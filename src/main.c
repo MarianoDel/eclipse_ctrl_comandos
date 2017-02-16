@@ -16,10 +16,11 @@
 /* Includes ------------------------------------------------------------------*/
 #include "hard.h"
 #include "core_cm0.h"
-#include "stm32f0x_gpio.h"
+#include "gpio.h"
 #include "stm32f0x_tim.h"
 #include "stm32f0xx_it.h"
 #include "dsp.h"
+#include "pwr.h"
 
 //#include <stdio.h>
 //#include <string.h>
@@ -38,6 +39,7 @@ volatile unsigned char seq_ready = 0;
 // ------- de los timers -------
 volatile unsigned short timer_standby;
 volatile unsigned char filter_timer;
+volatile unsigned short timer_for_stop;
 
 // ------- de los switches -------
 volatile unsigned short switches_timer;
@@ -118,6 +120,9 @@ int main(void)
 	TIM_3_Init();
 #endif
 
+	//habilito power modes
+	PwrInit ();	//se va a stop con o sin esto
+
 	//--- COMIENZO PROGRAMA DE PRODUCCION
 	for (i = 0; i < 6; i++)
 	{
@@ -128,6 +133,8 @@ int main(void)
 
 		Wait_ms(300);
 	}
+
+	timer_for_stop = TIMER_SLEEP;
 
 	//--- Main loop ---//
 	while(1)
@@ -149,6 +156,7 @@ int main(void)
 		{
 			TX_CODE_ON;
 			LED_ON;
+			timer_for_stop = TIMER_SLEEP;
 		}
 		else
 		{
@@ -169,9 +177,17 @@ int main(void)
 			}
 			LED_OFF;
 			Wait_ms(20);
+			timer_for_stop = TIMER_SLEEP;
 		}
 
 		UpdateSwitches ();
+
+		//go to stop mode
+		if (!timer_for_stop)
+		{
+			PWR_EnterSTOPMode(PWR_Regulator_ON, PWR_STOPEntry_WFI);
+			timer_for_stop = TIMER_SLEEP;
+		}
 
 	}	//termina while(1)
 
@@ -266,8 +282,8 @@ void TimingDelay_Decrement(void)
 	if (switches_timer)
 		switches_timer--;
 
-//	if (filter_timer)
-//		filter_timer--;
+	if (timer_for_stop)
+		timer_for_stop--;
 
 	if (timer_led_error)
 		timer_led_error--;

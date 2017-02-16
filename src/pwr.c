@@ -9,6 +9,12 @@
 #include "stm32f0xx.h"
 #include "core_cm0.h"
 
+void PwrInit (void)
+{
+	if (!RCC_PWR_CLK)
+		RCC_PWR_CLK_ON;
+}
+
 
 /**
   * @brief  Enters STOP mode.
