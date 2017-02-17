@@ -13,7 +13,8 @@
 //Code States
 enum {
 	C_INIT = 0,
-	C_SEND_PILOT,
+	C_SEND_PILOT_A,
+	C_SEND_PILOT_B,
 	C_SENDING,
 	C_SEND_ONE_A,
 	C_SEND_ONE_B,
