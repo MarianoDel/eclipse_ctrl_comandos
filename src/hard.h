@@ -89,7 +89,7 @@ enum {
 #define SWITCHES_THRESHOLD_HALF	100		//1 segundo
 #define SWITCHES_THRESHOLD_MIN	5		//50 ms
 
-#define TIMER_SLEEP			6000	//6 segundos
+#define TIMER_SLEEP			80	//6 segundos
 
 #define S_FULL		10
 #define S_HALF		3

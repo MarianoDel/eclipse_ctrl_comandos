@@ -47,7 +47,7 @@ unsigned char SendCode16 (unsigned short code, unsigned char bits)
 			break;
 
 		case C_SEND_PILOT_A:
-			if (TIM16->CNT > (12*lambda))
+			if (TIM16->CNT > (36*lambda))
 			{
 				TIM16->CNT = 0;
 				LED_ON;

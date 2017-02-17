@@ -173,7 +173,7 @@ int main(void)
 				break;
 
 			case TX_S1_A:
-				resp = SendCode16(0x0000, 16);
+				resp = SendCode16(0x0550, 12);
 
 				if (resp != RESP_CONTINUE)
 					main_state = TX_S1;
@@ -195,7 +195,7 @@ int main(void)
 				break;
 
 			case TX_S2_A:
-				resp = SendCode16(0xFFFF, 16);
+				resp = SendCode16(0x0551, 12);
 
 				if (resp != RESP_CONTINUE)
 					main_state = TX_S2;
@@ -206,8 +206,16 @@ int main(void)
 				if (!timer_for_stop)
 				{
 					EXTIOn();
+
+					if (GPIOA_CLK)
+						GPIOA_CLK_OFF;
+
 					//PWR_EnterSTOPMode(PWR_Regulator_ON, PWR_STOPEntry_WFI);		//0.04mA
 					PWR_EnterSTOPMode(PWR_Regulator_LowPower, PWR_STOPEntry_WFI);		//0.02mA
+
+					if (!GPIOA_CLK)
+						GPIOA_CLK_ON;
+
 					timer_for_stop = TIMER_SLEEP;
 				}
 				else

@@ -269,8 +269,8 @@ void TIM_16_Init (void)
 	TIM16->ARR = 0xFFFF;
 	TIM16->CNT = 0;
 	//TIM16->PSC = 7999;	//tick 1ms
-	TIM16->PSC = 799;	//tick 100us
-	//TIM16->PSC = 7;			//tick 1us
+	//TIM16->PSC = 799;	//tick 100us
+	TIM16->PSC = 7;			//tick 1us
 	TIM16->EGR = TIM_EGR_UG;
 
 	// Enable timer ver UDIS
@@ -280,12 +280,19 @@ void TIM_16_Init (void)
 
 void TIM16Enable (void)
 {
+	if (!RCC_TIM16_CLK)
+		RCC_TIM16_CLK_ON;
+
 	TIM16->CR1 |= TIM_CR1_CEN;
 }
 
 void TIM16Disable (void)
 {
 	TIM16->CR1 &= ~TIM_CR1_CEN;
+
+	if (RCC_TIM16_CLK)
+		RCC_TIM16_CLK_OFF;
+
 }
 
 void TIM17_IRQHandler (void)	//100uS
