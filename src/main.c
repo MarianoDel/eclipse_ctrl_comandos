@@ -184,7 +184,7 @@ int main(void)
 		{
 			timer_for_stop = TIMER_SLEEP;
 			SendCode16Reset();
-			while (SendCode16(0x0000, 17) == RESP_CONTINUE);
+			while (SendCode16(0x0550, 12) == RESP_CONTINUE);
 			Wait_ms(20);	//hace de pilot
 
 		}
@@ -194,7 +194,7 @@ int main(void)
 		{
 			timer_for_stop = TIMER_SLEEP;
 			SendCode16Reset();
-			while (SendCode16(0xFFFF, 16) == RESP_CONTINUE);
+			while (SendCode16(0xFFFF, 12) == RESP_CONTINUE);
 			Wait_ms(20);	//hace de pilot
 		}
 
