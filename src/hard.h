@@ -52,7 +52,7 @@
 #endif
 
 //-------- Respuestas de Funciones -------------------------//
-enum RspMessages
+enum
 {
 	RESP_CONTINUE = 0,
 	RESP_SELECTED,
@@ -68,7 +68,7 @@ enum RspMessages
 	RESP_NO_ANSWER,
 	RESP_TIMEOUT,
 	RESP_READY
-};
+} typedef RspMessages;
 
 //ESTADOS DEL PROGRAMA PRINCIPAL
 enum {

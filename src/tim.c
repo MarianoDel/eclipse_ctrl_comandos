@@ -185,6 +185,7 @@ void TIM_3_Init (void)
 
 }
 
+//OJO TIM6 no esta disponible en todas las versiones
 void TIM_6_Init (void)
 {
 	if (!RCC_TIM6_CLK)
@@ -192,9 +193,20 @@ void TIM_6_Init (void)
 
 	//Configuracion del timer.
 	TIM6->CR1 = 0x00;		//clk int / 1; upcounting
-	TIM6->PSC = 47;			//tick cada 1us
-	TIM6->ARR = 0xFFFF;			//para que arranque
+	TIM6->PSC = 47;			//tick cada 1us @ 48MHz
+	TIM6->ARR = 1000;			//para que arranque
+	TIM6->EGR = TIM_EGR_UG;		//update de registros
 	//TIM6->CR1 |= TIM_CR1_CEN;
+}
+
+void TIM6Enable (void)
+{
+	TIM6->CR1 |= TIM_CR1_CEN;
+}
+
+void TIM6Disable (void)
+{
+	TIM6->CR1 &= ~TIM_CR1_CEN;
 }
 
 void TIM14_IRQHandler (void)	//100uS
@@ -249,26 +261,30 @@ void TIM16_IRQHandler (void)	//100uS
 
 void TIM_16_Init (void)
 {
-
-//	NVIC_InitTypeDef NVIC_InitStructure;
-
 	if (!RCC_TIM16_CLK)
 		RCC_TIM16_CLK_ON;
 
 	//Configuracion del timer.
-	TIM16->ARR = 2000; //10m
+	TIM16->CR1 = 0x00;		//clk int / 1; upcounting; uev
+	TIM16->ARR = 0xFFFF;
 	TIM16->CNT = 0;
-	TIM16->PSC = 479;
+	TIM16->PSC = 7999;	//tick 1ms
+	//TIM16->PSC = 7;			//tick 1us
 	TIM16->EGR = TIM_EGR_UG;
 
 	// Enable timer ver UDIS
-	TIM16->DIER |= TIM_DIER_UIE;
-	TIM16->CR1 |= TIM_CR1_CEN;
+//	TIM16->DIER |= TIM_DIER_UIE;
+//	TIM16->CR1 |= TIM_CR1_CEN;
+}
 
-//	NVIC_InitStructure.NVIC_IRQChannel = TIM16_IRQn;
-//	NVIC_InitStructure.NVIC_IRQChannelPriority = 5;
-//	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-//	NVIC_Init(&NVIC_InitStructure);
+void TIM16Enable (void)
+{
+	TIM16->CR1 |= TIM_CR1_CEN;
+}
+
+void TIM16Disable (void)
+{
+	TIM16->CR1 &= ~TIM_CR1_CEN;
 }
 
 void TIM17_IRQHandler (void)	//100uS

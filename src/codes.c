@@ -7,6 +7,7 @@
 
 #include "codes.h"
 #include "hard.h"
+#include "tim.h"
 
 //--- External Variables -----
 
@@ -19,7 +20,7 @@ unsigned char send_state = 0;
 //contesta RESP_CONTINUE si falta o RESP_OK si termino
 unsigned char SendCode16 (unsigned short c, unsigned char bits)
 {
-	enum RspMessages resp = RESP_CONTINUE;
+	RspMessages resp = RESP_CONTINUE;
 
 	switch (send_state)
 	{

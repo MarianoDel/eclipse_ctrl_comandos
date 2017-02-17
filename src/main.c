@@ -115,13 +115,8 @@ int main(void)
 
 
 	//TIM Configuration.
-#if ((defined BOOST_WITH_CONTROL) || (defined BOOST_CONVENCIONAL))
-	TIM_3_Init();
-#endif
-#ifdef BUCK_BOOST_WITH_CONTROL
-	TIM_1_Init();
-	TIM_3_Init();
-#endif
+	TIM_16_Init();
+	//TIM_3_Init();
 
 	//habilito power modes
 	PwrInit ();	//se va a stop con o sin esto
@@ -134,6 +129,11 @@ int main(void)
 		else
 			LED_ON;
 
+
+//		TIM16->CNT = 0;
+//		TIM16Enable();
+//		while (TIM16->CNT < 300);
+//		TIM16Disable();
 		Wait_ms(300);
 	}
 

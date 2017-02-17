@@ -71,6 +71,12 @@ void Update_TIM3_CH4 (unsigned short);
 void Update_TIM3_Freq (unsigned short);
 void Wait_ms (unsigned short wait);
 
+void TIM6Enable (void);
+void TIM6Disable (void);
+
+void TIM16Enable (void);
+void TIM16Disable (void);
+
 #define Update_Buck(X) Update_TIM3_CH1(X)
 #define Update_Boost(X) Update_TIM3_CH2(X)
 #endif
