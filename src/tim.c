@@ -14,10 +14,10 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f0x_tim.h"
-#include "stm32f0xx_tim.h"
-#include "stm32f0xx_misc.h"
-
+#include "tim.h"
+//#include "stm32f0xx_tim.h"
+//#include "stm32f0xx_misc.h"
+#include "stm32f0xx.h"
 #include "hard.h"
 
 //--- VARIABLES EXTERNAS ---//
@@ -250,7 +250,7 @@ void TIM16_IRQHandler (void)	//100uS
 void TIM_16_Init (void)
 {
 
-	NVIC_InitTypeDef NVIC_InitStructure;
+//	NVIC_InitTypeDef NVIC_InitStructure;
 
 	if (!RCC_TIM16_CLK)
 		RCC_TIM16_CLK_ON;
@@ -265,10 +265,10 @@ void TIM_16_Init (void)
 	TIM16->DIER |= TIM_DIER_UIE;
 	TIM16->CR1 |= TIM_CR1_CEN;
 
-	NVIC_InitStructure.NVIC_IRQChannel = TIM16_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPriority = 5;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure);
+//	NVIC_InitStructure.NVIC_IRQChannel = TIM16_IRQn;
+//	NVIC_InitStructure.NVIC_IRQChannelPriority = 5;
+//	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+//	NVIC_Init(&NVIC_InitStructure);
 }
 
 void TIM17_IRQHandler (void)	//100uS
@@ -288,7 +288,7 @@ void TIM17_IRQHandler (void)	//100uS
 void TIM_17_Init (void)
 {
 
-	NVIC_InitTypeDef NVIC_InitStructure;
+//	NVIC_InitTypeDef NVIC_InitStructure;
 
 	if (!RCC_TIM17_CLK)
 		RCC_TIM17_CLK_ON;
@@ -303,10 +303,10 @@ void TIM_17_Init (void)
 	TIM17->DIER |= TIM_DIER_UIE;
 	TIM17->CR1 |= TIM_CR1_CEN;
 
-	NVIC_InitStructure.NVIC_IRQChannel = TIM17_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPriority = 5;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure);
+//	NVIC_InitStructure.NVIC_IRQChannel = TIM17_IRQn;
+//	NVIC_InitStructure.NVIC_IRQChannelPriority = 5;
+//	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+//	NVIC_Init(&NVIC_InitStructure);
 }
 
 //--- end of file ---//

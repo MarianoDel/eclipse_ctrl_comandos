@@ -17,10 +17,11 @@
 #include "hard.h"
 #include "core_cm0.h"
 #include "gpio.h"
-#include "stm32f0x_tim.h"
+#include "tim.h"
 #include "stm32f0xx_it.h"
 #include "dsp.h"
 #include "pwr.h"
+#include "codes.h"
 
 //#include <stdio.h>
 //#include <string.h>
@@ -70,8 +71,6 @@ void UpdateSwitches (void);
 unsigned char CheckS1 (void);
 unsigned char CheckS2 (void);
 
-// ------- del DMX -------
-extern void EXTI4_15_IRQHandler(void);
 
 
 //-------------------------------------------//
@@ -82,6 +81,7 @@ extern void EXTI4_15_IRQHandler(void);
 int main(void)
 {
 	unsigned char i;
+	enum RspMessages resp = RESP_CONTINUE;
 
 	//!< At this stage the microcontroller clock setting is already configured,
     //   this is done through SystemInit() function which is called from startup

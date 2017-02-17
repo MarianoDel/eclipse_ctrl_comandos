@@ -51,6 +51,24 @@
 //GPIOB pin1
 #endif
 
+//-------- Respuestas de Funciones -------------------------//
+enum RspMessages
+{
+	RESP_CONTINUE = 0,
+	RESP_SELECTED,
+	RESP_CHANGE,
+	RESP_CHANGE_ALL_UP,
+	RESP_WORKING,
+	RESP_FINISH,
+	RESP_YES,
+	RESP_NO,
+	RESP_NO_CHANGE,
+	RESP_OK,
+	RESP_NOK,
+	RESP_NO_ANSWER,
+	RESP_TIMEOUT,
+	RESP_READY
+};
 
 //ESTADOS DEL PROGRAMA PRINCIPAL
 enum {
