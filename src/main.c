@@ -81,7 +81,7 @@ unsigned char CheckS2 (void);
 int main(void)
 {
 	unsigned char i;
-	enum RspMessages resp = RESP_CONTINUE;
+	RspMessages resp = RESP_CONTINUE;
 
 	//!< At this stage the microcontroller clock setting is already configured,
     //   this is done through SystemInit() function which is called from startup
@@ -182,42 +182,32 @@ int main(void)
 		//if (S1)
 		if (CheckS1())
 		{
-			TX_CODE_ON;
-			LED_ON;
 			timer_for_stop = TIMER_SLEEP;
-		}
-		else
-		{
-			TX_CODE_OFF;
-			LED_OFF;
+			SendCode16Reset();
+			while (SendCode16(0x0000, 17) == RESP_CONTINUE);
+			Wait_ms(20);	//hace de pilot
+
 		}
 
 		//if (S2)
 		if (CheckS2())
 		{
-			LED_ON;
-			for (i = 0; i < 10; i++)
-			{
-				TX_CODE_ON;
-				Wait_ms(1);
-				TX_CODE_OFF;
-				Wait_ms(1);
-			}
-			LED_OFF;
-			Wait_ms(20);
 			timer_for_stop = TIMER_SLEEP;
+			SendCode16Reset();
+			while (SendCode16(0xFFFF, 16) == RESP_CONTINUE);
+			Wait_ms(20);	//hace de pilot
 		}
 
 		UpdateSwitches ();
 
 		//go to stop mode
-		if (!timer_for_stop)
-		{
-			EXTIOn();
-			//PWR_EnterSTOPMode(PWR_Regulator_ON, PWR_STOPEntry_WFI);		//0.04mA
-			PWR_EnterSTOPMode(PWR_Regulator_LowPower, PWR_STOPEntry_WFI);		//0.02mA
-			timer_for_stop = TIMER_SLEEP;
-		}
+//		if (!timer_for_stop)
+//		{
+//			EXTIOn();
+//			//PWR_EnterSTOPMode(PWR_Regulator_ON, PWR_STOPEntry_WFI);		//0.04mA
+//			PWR_EnterSTOPMode(PWR_Regulator_LowPower, PWR_STOPEntry_WFI);		//0.02mA
+//			timer_for_stop = TIMER_SLEEP;
+//		}
 
 	}	//termina while(1)
 

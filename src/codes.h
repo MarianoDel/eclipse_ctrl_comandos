@@ -8,10 +8,19 @@
 #ifndef CODES_H_
 #define CODES_H_
 
+
+#define		DEFAULT_LAMBDA		560		//en us
 //Code States
 enum {
 	C_INIT = 0,
+	C_SEND_PILOT,
 	C_SENDING,
+	C_SEND_ONE_A,
+	C_SEND_ONE_B,
+	C_SEND_ONE_C,
+	C_SEND_ZERO_A,
+	C_SEND_ZERO_B,
+	C_SEND_ZERO_C,
 	C_FINISH
 
 } typedef CodeState;
