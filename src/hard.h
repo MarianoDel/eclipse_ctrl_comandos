@@ -72,17 +72,16 @@ enum
 
 //ESTADOS DEL PROGRAMA PRINCIPAL
 enum {
-	ERROR_INIT = 0,
-	ERROR_LOW_VIN,
-	ERROR_HIGH_VIN,
-	ERROR_WRONG_VIN,
-	ERROR_RUN,
-	ERROR_RUN_A,
-	ERROR_RUN_B,
-	ERROR_OK
+	CHECK_EVENTS = 0,
+	TX_S1,
+	TX_S1_A,
+	TX_S2,
+	TX_S2_A,
+	SLEEPING
 
-} typedef ErrorState;
+} typedef MainStates;
 
+#define REPEAT_CODES	3
 #define SWITCHES_TIMER_RELOAD	10
 
 #define SWITCHES_ROOF			400
@@ -90,7 +89,7 @@ enum {
 #define SWITCHES_THRESHOLD_HALF	100		//1 segundo
 #define SWITCHES_THRESHOLD_MIN	5		//50 ms
 
-#define TIMER_SLEEP			6000	//6 segundos
+#define TIMER_SLEEP			80	//6 segundos
 
 #define S_FULL		10
 #define S_HALF		3

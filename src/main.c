@@ -82,6 +82,8 @@ int main(void)
 {
 	unsigned char i;
 	RspMessages resp = RESP_CONTINUE;
+	MainStates main_state = CHECK_EVENTS;
+	unsigned char repeat;
 
 	//!< At this stage the microcontroller clock setting is already configured,
     //   this is done through SystemInit() function which is called from startup
@@ -116,7 +118,6 @@ int main(void)
 
 	//TIM Configuration.
 	TIM_16_Init();
-	//TIM_3_Init();
 
 	//habilito power modes
 	PwrInit ();	//se va a stop con o sin esto
@@ -129,59 +130,17 @@ int main(void)
 		else
 			LED_ON;
 
-
-//		TIM16->CNT = 0;
-//		TIM16Enable();
-//		while (TIM16->CNT < 300);
-//		TIM16Disable();
 		Wait_ms(300);
 	}
-
-//	//Prueba interrupciones
-//	EXTIOn();
-//	while (1)
-//	{
-//		if (led == 1)
-//		{
-//			led = 0;
-//			LED_ON;
-//			Wait_ms(500);
-//			LED_OFF;
-//		}
-//
-//		if (led == 2)
-//		{
-//			led = 0;
-//			LED_ON;
-//			Wait_ms(500);
-//			LED_OFF;
-//			Wait_ms(500);
-//			LED_ON;
-//			Wait_ms(500);
-//			LED_OFF;
-//		}
-//	}
 
 	timer_for_stop = TIMER_SLEEP;
 
 	//--- Main loop ---//
 	while(1)
 	{
-//		if (LED)
-//		{
-//			LED_OFF;
-//			TX_CODE_OFF;
-//		}
-//		else
-//		{
-//			LED_ON;
-//			TX_CODE_ON;
-//		}
-//
-//		Wait_ms(3);
-		//if (S1)
-		if (CheckS1())
+		switch (main_state)
 		{
+<<<<<<< HEAD
 			timer_for_stop = TIMER_SLEEP;
 			SendCode16Reset();
 			while (SendCode16(0x0550, 12) == RESP_CONTINUE);
@@ -197,17 +156,98 @@ int main(void)
 			while (SendCode16(0xFFFF, 12) == RESP_CONTINUE);
 			Wait_ms(20);	//hace de pilot
 		}
+=======
+			case CHECK_EVENTS:
+				if (CheckS1())
+				{
+					repeat = REPEAT_CODES;
+					main_state = TX_S1;
+				}
+
+				if (CheckS2())
+				{
+					repeat = REPEAT_CODES;
+					main_state = TX_S2;
+				}
+
+				if (!timer_for_stop)
+					main_state = SLEEPING;
+
+				break;
+
+			case TX_S1:
+				if (repeat)
+				{
+					repeat--;
+					SendCode16Reset();
+					main_state = TX_S1_A;
+				}
+				else
+				{
+					timer_for_stop = TIMER_SLEEP;
+					main_state = CHECK_EVENTS;
+				}
+				break;
+
+			case TX_S1_A:
+				resp = SendCode16(0x0550, 12);
+
+				if (resp != RESP_CONTINUE)
+					main_state = TX_S1;
+
+				break;
+
+			case TX_S2:
+				if (repeat)
+				{
+					repeat--;
+					SendCode16Reset();
+					main_state = TX_S2_A;
+				}
+				else
+				{
+					timer_for_stop = TIMER_SLEEP;
+					main_state = CHECK_EVENTS;
+				}
+				break;
+
+			case TX_S2_A:
+				resp = SendCode16(0x0551, 12);
+
+				if (resp != RESP_CONTINUE)
+					main_state = TX_S2;
+
+				break;
+
+			case SLEEPING:
+				if (!timer_for_stop)
+				{
+					EXTIOn();
+
+					if (GPIOA_CLK)
+						GPIOA_CLK_OFF;
+
+					//PWR_EnterSTOPMode(PWR_Regulator_ON, PWR_STOPEntry_WFI);		//0.04mA
+					PWR_EnterSTOPMode(PWR_Regulator_LowPower, PWR_STOPEntry_WFI);		//0.02mA
+
+					if (!GPIOA_CLK)
+						GPIOA_CLK_ON;
+
+					timer_for_stop = TIMER_SLEEP;
+				}
+				else
+					main_state = CHECK_EVENTS;
+
+				break;
+
+			default:
+				main_state = CHECK_EVENTS;
+				break;
+		}
+
+>>>>>>> principal
 
 		UpdateSwitches ();
-
-		//go to stop mode
-//		if (!timer_for_stop)
-//		{
-//			EXTIOn();
-//			//PWR_EnterSTOPMode(PWR_Regulator_ON, PWR_STOPEntry_WFI);		//0.04mA
-//			PWR_EnterSTOPMode(PWR_Regulator_LowPower, PWR_STOPEntry_WFI);		//0.02mA
-//			timer_for_stop = TIMER_SLEEP;
-//		}
 
 	}	//termina while(1)
 

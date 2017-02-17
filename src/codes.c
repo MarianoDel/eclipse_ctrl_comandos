@@ -38,18 +38,28 @@ unsigned char SendCode16 (unsigned short code, unsigned char bits)
 				bitmask <<= bits;
 
 				lambda = DEFAULT_LAMBDA;
-				send_state = C_SEND_PILOT;
+				send_state = C_SEND_PILOT_A;
 				TIM16->CNT = 0;
 				TIM16Enable();
-				LED_ON;
-				TX_CODE_ON;
+				LED_OFF;
+				TX_CODE_OFF;
 			}
 			break;
 
-		case C_SEND_PILOT:
-			if (TIM16->CNT > (lambda))
+		case C_SEND_PILOT_A:
+			if (TIM16->CNT > (36*lambda))
 			{
 				TIM16->CNT = 0;
+				LED_ON;
+				TX_CODE_ON;			//bit de pilot
+				send_state = C_SEND_PILOT_B;
+			}
+			break;
+
+		case C_SEND_PILOT_B:
+			if (TIM16->CNT > (lambda))
+			{
+				//TIM16->CNT = 0;
 				LED_OFF;
 				TX_CODE_OFF;			//apago, siempre despues de pilot
 				send_state = C_SENDING;
