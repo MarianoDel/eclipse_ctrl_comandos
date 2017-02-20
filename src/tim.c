@@ -269,10 +269,7 @@ void TIM_16_Init (void)
 	TIM16->ARR = 0xFFFF;
 	TIM16->CNT = 0;
 	//TIM16->PSC = 7999;	//tick 1ms
-<<<<<<< HEAD
-=======
 	//TIM16->PSC = 799;	//tick 100us
->>>>>>> principal
 	TIM16->PSC = 7;			//tick 1us
 	TIM16->EGR = TIM_EGR_UG;
 

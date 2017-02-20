@@ -9,7 +9,7 @@
 #define CODES_H_
 
 
-#define		DEFAULT_LAMBDA		560		//en us
+#define		DEFAULT_LAMBDA		520		//en us
 //Code States
 enum {
 	C_INIT = 0,

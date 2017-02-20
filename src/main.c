@@ -140,23 +140,6 @@ int main(void)
 	{
 		switch (main_state)
 		{
-<<<<<<< HEAD
-			timer_for_stop = TIMER_SLEEP;
-			SendCode16Reset();
-			while (SendCode16(0x0550, 12) == RESP_CONTINUE);
-			Wait_ms(20);	//hace de pilot
-
-		}
-
-		//if (S2)
-		if (CheckS2())
-		{
-			timer_for_stop = TIMER_SLEEP;
-			SendCode16Reset();
-			while (SendCode16(0xFFFF, 12) == RESP_CONTINUE);
-			Wait_ms(20);	//hace de pilot
-		}
-=======
 			case CHECK_EVENTS:
 				if (CheckS1())
 				{
@@ -244,8 +227,6 @@ int main(void)
 				main_state = CHECK_EVENTS;
 				break;
 		}
-
->>>>>>> principal
 
 		UpdateSwitches ();
 

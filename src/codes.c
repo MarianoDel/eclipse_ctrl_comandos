@@ -118,7 +118,8 @@ unsigned char SendCode16 (unsigned short code, unsigned char bits)
 			break;
 
 		case C_SEND_ZERO_B:
-			if (TIM16->CNT > (lambda))
+			//if (TIM16->CNT > (lambda))
+			if (TIM16->CNT > (440))
 			{
 				TIM16->CNT = 0;
 				LED_ON;
@@ -128,7 +129,8 @@ unsigned char SendCode16 (unsigned short code, unsigned char bits)
 			break;
 
 		case C_SEND_ZERO_C:
-			if (TIM16->CNT > (2*lambda))
+			//if (TIM16->CNT > (2*lambda))
+			if (TIM16->CNT > (1200))
 			{
 				TIM16->CNT = 0;
 				LED_OFF;
