@@ -195,7 +195,7 @@ int main(void)
 				break;
 
 			case TX_S2_A:
-				resp = SendCode16(0x0551, 12);
+				resp = SendCode16(0x0550, 12);
 
 				if (resp != RESP_CONTINUE)
 					main_state = TX_S2;

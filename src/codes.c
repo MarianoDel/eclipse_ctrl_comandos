@@ -57,7 +57,8 @@ unsigned char SendCode16 (unsigned short code, unsigned char bits)
 			break;
 
 		case C_SEND_PILOT_B:
-			if (TIM16->CNT > (lambda))
+			//if (TIM16->CNT > (lambda))
+			if (TIM16->CNT > 900)		//el algoritmo es mas corto cuando entra por S1 q cuando entra por S2
 			{
 				//TIM16->CNT = 0;
 				LED_OFF;
@@ -119,7 +120,7 @@ unsigned char SendCode16 (unsigned short code, unsigned char bits)
 
 		case C_SEND_ZERO_B:
 			//if (TIM16->CNT > (lambda))
-			if (TIM16->CNT > (440))
+			if (TIM16->CNT > (360))
 			{
 				TIM16->CNT = 0;
 				LED_ON;
@@ -130,7 +131,7 @@ unsigned char SendCode16 (unsigned short code, unsigned char bits)
 
 		case C_SEND_ZERO_C:
 			//if (TIM16->CNT > (2*lambda))
-			if (TIM16->CNT > (1200))
+			if (TIM16->CNT > (1280))
 			{
 				TIM16->CNT = 0;
 				LED_OFF;
