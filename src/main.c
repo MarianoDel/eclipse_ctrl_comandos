@@ -84,6 +84,8 @@ int main(void)
 	RspMessages resp = RESP_CONTINUE;
 	MainStates main_state = CHECK_EVENTS;
 	unsigned char repeat;
+	unsigned short rxcode = 0;
+	unsigned char rxbits = 0;
 
 	//!< At this stage the microcontroller clock setting is already configured,
     //   this is done through SystemInit() function which is called from startup
@@ -144,7 +146,7 @@ int main(void)
 				if (CheckS1())
 				{
 					repeat = REPEAT_CODES;
-					main_state = TX_S1;
+					main_state = RX_S1;
 				}
 
 				if (CheckS2())
@@ -199,6 +201,29 @@ int main(void)
 
 				if (resp != RESP_CONTINUE)
 					main_state = TX_S2;
+
+				break;
+
+			case RX_S1:
+				RecvCode16Reset();
+				main_state = RX_S1_A;
+				timer_for_stop = TIMER_FOR_SAVE;
+
+				break;
+
+			case RX_S1_A:
+				resp = RecvCode16(&rxcode, &rxbits);
+
+				if (resp != RESP_CONTINUE)
+				{
+					main_state =  CHECK_EVENTS;
+				}
+				else if (!timer_for_stop)
+				{
+					main_state = CHECK_EVENTS;
+					RX_CODE_PLLUP_OFF;
+					RX_EN_OFF;
+				}
 
 				break;
 

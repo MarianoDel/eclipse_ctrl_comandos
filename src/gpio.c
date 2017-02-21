@@ -74,8 +74,8 @@ void GPIO_Config (void)
 		GPIOA_CLK_ON;
 
 	temp = GPIOA->MODER;	//2 bits por pin
-	temp &= 0xFFFFFC30;		//PA0 input; PA1 out; PA3 out; PA4 input
-	temp |= 0x00000044;
+	temp &= 0xFFFFC030;		//PA0 input; PA1 out; PA3 out; PA4 input; PA5 input; PA6 out
+	temp |= 0x00001044;
 	GPIOA->MODER = temp;
 
 	temp = GPIOA->OTYPER;	//1 bit por pin
@@ -207,6 +207,26 @@ inline void EXTIOff (void)
 inline void EXTIOn (void)
 {
 	EXTI->IMR |= 0x00000011;
+}
+
+void Gpio5PullUpOn (void)
+{
+	unsigned long temp;
+
+	temp = GPIOA->PUPDR;	//2 bits por pin
+	temp &= 0xFFFFF3FF;		//PA5 pull up
+	temp |= 0x00000400;
+	GPIOA->PUPDR = temp;
+}
+
+void Gpio5PullUpOff (void)
+{
+//	unsigned long temp;
+//	temp = GPIOA->PUPDR;	//2 bits por pin
+//	temp &= 0xFFFFCFFF;		//PA6 not pull up
+//	temp |= 0x00000000;
+//	GPIOA->PUPDR = temp;
+	GPIOA->PUPDR &= 0xFFFFF3FF;
 }
 
 //--- end of file ---//

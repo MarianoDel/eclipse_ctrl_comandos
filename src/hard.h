@@ -40,7 +40,15 @@
 #define S2 ((GPIOA->IDR & 0x0010) == 0)
 
 //GPIOA pin5
+#define RX_CODE ((GPIOA->ODR & 0x0020) != 0)
+#define RX_CODE_ON	GPIOA->BSRR = 0x00000020
+#define RX_CODE_OFF GPIOA->BSRR = 0x00200000
+
 //GPIOA pin6
+#define RX_EN 		((GPIOA->ODR & 0x0040) != 0)
+#define RX_EN_ON	GPIOA->BSRR = 0x00000040
+#define RX_EN_OFF 	GPIOA->BSRR = 0x00400000
+
 //GPIOA pin7
 
 //GPIOA pin9
@@ -77,6 +85,8 @@ enum {
 	TX_S1_A,
 	TX_S2,
 	TX_S2_A,
+	RX_S1,
+	RX_S1_A,
 	SLEEPING
 
 } typedef MainStates;
@@ -89,7 +99,8 @@ enum {
 #define SWITCHES_THRESHOLD_HALF	100		//1 segundo
 #define SWITCHES_THRESHOLD_MIN	5		//50 ms
 
-#define TIMER_SLEEP			80	//6 segundos
+#define TIMER_SLEEP			80		//80ms
+#define TIMER_FOR_SAVE		4000	//4 segundos
 
 #define S_FULL		10
 #define S_HALF		3

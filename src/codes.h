@@ -8,6 +8,11 @@
 #ifndef CODES_H_
 #define CODES_H_
 
+#include "gpio.h"
+
+#define RX_CODE_PLLUP_ON Gpio5PullUpOn()
+#define RX_CODE_PLLUP_OFF Gpio5PullUpOff()
+
 
 #define		DEFAULT_LAMBDA		540		//en us
 //Code States
@@ -24,10 +29,19 @@ enum {
 	C_SEND_ZERO_C,
 	C_FINISH
 
-} typedef CodeState;
+} typedef CodeStateTX;
+
+enum {
+	C_RXINIT = 0,
+	C_RXWAIT_PILOT_A,
+	C_RXFINISH
+
+} typedef CodeStateRX;
 
 //--- Funciones del Modulo ---
 unsigned char SendCode16 (unsigned short, unsigned char);
 void SendCode16Reset (void);
+unsigned char RecvCode16 (unsigned short *, unsigned char *);
+void RecvCode16Reset (void);
 
 #endif /* CODES_H_ */

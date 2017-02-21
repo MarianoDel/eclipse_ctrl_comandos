@@ -10,10 +10,13 @@
 #include "tim.h"
 #include "stm32f0xx.h"
 
+
+
 //--- External Variables -----
 
 //--- Global Variables -------
 unsigned char send_state = 0;
+unsigned char recv_state = 0;
 unsigned short bitmask;
 unsigned short lambda;
 
@@ -153,3 +156,36 @@ inline void SendCode16Reset (void)
 	send_state = C_INIT;
 }
 
+//resetea la SM de RecvCode
+inline void RecvCode16Reset (void)
+{
+	recv_state = C_INIT;
+}
+
+//Recibe el codigo de hasta 2 bytes (16bits), c es codigo, bits a enviar
+//contesta RESP_CONTINUE si falta o RESP_OK si termino RESP_NOK en error
+unsigned char RecvCode16 (unsigned short * code, unsigned char * bits)
+{
+	RspMessages resp = RESP_CONTINUE;
+
+
+	switch (recv_state)
+	{
+		case C_RXINIT:
+			recv_state = C_RXWAIT_PILOT_A;
+			TIM16->CNT = 0;
+			TIM16Enable();
+			RX_CODE_PLLUP_ON;
+			RX_EN_ON;
+			break;
+
+		case C_RXWAIT_PILOT_A:
+			break;
+
+
+		default:
+			send_state = C_RXINIT;
+			break;
+	}
+	return resp;
+}
