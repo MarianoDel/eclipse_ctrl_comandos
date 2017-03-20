@@ -20,7 +20,7 @@ unsigned char recv_state = 0;
 unsigned short bitmask;
 unsigned short lambda;
 
-unsigned short bits_t [64];
+unsigned short bits_t [SIZEOF_BUFF_TRANS];
 unsigned char bits_c;
 
 //unsigned char last_c;
@@ -164,7 +164,7 @@ inline void SendCode16Reset (void)
 //resetea la SM de RecvCode
 inline void RecvCode16Reset (void)
 {
-	recv_state = C_INIT;
+	recv_state = C_RXINIT;
 }
 
 //Recibe el codigo de hasta 2 bytes (16bits), c es codigo, bits a enviar
@@ -182,8 +182,8 @@ unsigned char RecvCode16 (unsigned short * code, unsigned char * bits)
 			TIM16->CNT = 0;
 			TIM16Enable();
 			RX_CODE_PLLUP_ON;
-			bits_c = 0;			//lo uso como timeout counter
 			RX_EN_ON;
+			bits_c = 0;			//lo uso como timeout counter
 			break;
 
 		case C_RXINIT_PULLUP:
@@ -199,11 +199,13 @@ unsigned char RecvCode16 (unsigned short * code, unsigned char * bits)
 			if (TIM16->CNT > 60000)	//pasaron 60 msegs sin nada
 			{
 				if (bits_c < 100)
+				{
 					bits_c++;
+					TIM16->CNT = 0;
+				}
 				else
 					recv_state = C_RXTIMEOUT;
 			}
-
 
 			if (!RX_CODE)	//tengo transicion inicio pilot
 			{
@@ -230,7 +232,8 @@ unsigned char RecvCode16 (unsigned short * code, unsigned char * bits)
 			//segunda transcicion de bit
 			if (TIM16->CNT > 3000)	//pasaron 3mseg sin nada, puede ser el final del codigo
 			{
-				bits_c >>= 1;
+				bits_c -= 1;	//ajusto pilot
+				bits_c >>= 1;	//2 transciciones 1 bit
 				if (bits_c == 12)
 					recv_state = C_RXOK;
 				else
@@ -242,8 +245,15 @@ unsigned char RecvCode16 (unsigned short * code, unsigned char * bits)
 			{
 				bits_t[bits_c] = TIM16->CNT;
 				TIM16->CNT = 0;
-				bits_c++;
-				recv_state = C_RXWAIT_BITS_C;
+
+				if (bits_c < SIZEOF_BUFF_TRANS)
+				{
+					bits_c++;
+					recv_state = C_RXWAIT_BITS_C;
+				}
+				else
+					recv_state = C_RXERROR;
+
 			}
 			break;
 
@@ -256,8 +266,15 @@ unsigned char RecvCode16 (unsigned short * code, unsigned char * bits)
 			{
 				bits_t[bits_c] = TIM16->CNT;
 				TIM16->CNT = 0;
-				bits_c++;
-				recv_state = C_RXWAIT_BITS_B;
+
+				if (bits_c < SIZEOF_BUFF_TRANS)
+				{
+					bits_c++;
+					recv_state = C_RXWAIT_BITS_B;
+				}
+				else
+					recv_state = C_RXERROR;
+
 			}
 			break;
 
@@ -265,18 +282,21 @@ unsigned char RecvCode16 (unsigned short * code, unsigned char * bits)
 			//termine recepcion con error
 			RX_CODE_PLLUP_OFF;
 			RX_EN_OFF;
+			TIM16Disable();
 			resp = RESP_NOK;
 			break;
 
 		case C_RXOK:
 			RX_CODE_PLLUP_OFF;
 			RX_EN_OFF;
+			TIM16Disable();
 			resp = RESP_OK;
 			break;
 
 		case C_RXTIMEOUT:
 			RX_CODE_PLLUP_OFF;
 			RX_EN_OFF;
+			TIM16Disable();
 			resp = RESP_TIMEOUT;
 			break;
 

@@ -40,7 +40,7 @@
 #define S2 ((GPIOA->IDR & 0x0010) == 0)
 
 //GPIOA pin5
-#define RX_CODE ((GPIOA->ODR & 0x0020) != 0)
+#define RX_CODE ((GPIOA->ODR & 0x0020) == 0)
 #define RX_CODE_ON	GPIOA->BSRR = 0x00000020
 #define RX_CODE_OFF GPIOA->BSRR = 0x00200000
 
@@ -89,6 +89,7 @@ enum {
 	RX_S1_A,
 	RX_S1_OK,
 	RX_S1_TO,
+	RX_S1_NOK,
 	SLEEPING
 
 } typedef MainStates;

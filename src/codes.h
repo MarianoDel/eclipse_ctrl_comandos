@@ -13,6 +13,8 @@
 #define RX_CODE_PLLUP_ON Gpio5PullUpOn()
 #define RX_CODE_PLLUP_OFF Gpio5PullUpOff()
 
+#define SIZEOF_BUFF_TRANS	64
+
 
 #define		DEFAULT_LAMBDA		540		//en us
 //Code States

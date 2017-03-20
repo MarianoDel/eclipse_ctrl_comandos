@@ -220,7 +220,8 @@ int main(void)
 
 				if (resp == RESP_NOK)
 				{
-					RecvCode16Reset();		//cuantas veces????
+					//RecvCode16Reset();		//cuantas veces????
+					main_state = RX_S1_NOK;
 				}
 
 				if (resp == RESP_TIMEOUT)
@@ -232,6 +233,19 @@ int main(void)
 
 			case RX_S1_OK:
 				for (i = 0; i < 6; i++)
+				{
+					LED_ON;
+					Wait_ms(250);
+					LED_OFF;
+					Wait_ms(250);
+				}
+
+				main_state =  CHECK_EVENTS;
+
+				break;
+
+			case RX_S1_NOK:
+				for (i = 0; i < 2; i++)
 				{
 					LED_ON;
 					Wait_ms(250);
