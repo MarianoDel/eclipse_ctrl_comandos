@@ -87,6 +87,8 @@ enum {
 	TX_S2_A,
 	RX_S1,
 	RX_S1_A,
+	RX_S1_OK,
+	RX_S1_TO,
 	SLEEPING
 
 } typedef MainStates;

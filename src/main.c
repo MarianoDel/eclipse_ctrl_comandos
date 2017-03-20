@@ -207,24 +207,49 @@ int main(void)
 			case RX_S1:
 				RecvCode16Reset();
 				main_state = RX_S1_A;
-				timer_for_stop = TIMER_FOR_SAVE;
 
 				break;
 
 			case RX_S1_A:
 				resp = RecvCode16(&rxcode, &rxbits);
 
-				if (resp != RESP_CONTINUE)
+				if (resp == RESP_OK)
 				{
-					main_state =  CHECK_EVENTS;
-				}
-				else if (!timer_for_stop)
-				{
-					main_state = CHECK_EVENTS;
-					RX_CODE_PLLUP_OFF;
-					RX_EN_OFF;
+					main_state = RX_S1_OK;
 				}
 
+				if (resp == RESP_NOK)
+				{
+					RecvCode16Reset();		//cuantas veces????
+				}
+
+				if (resp == RESP_TIMEOUT)
+				{
+					main_state = RX_S1_TO;
+				}
+
+				break;
+
+			case RX_S1_OK:
+				for (i = 0; i < 6; i++)
+				{
+					LED_ON;
+					Wait_ms(250);
+					LED_OFF;
+					Wait_ms(250);
+				}
+
+				main_state =  CHECK_EVENTS;
+
+				break;
+
+			case RX_S1_TO:
+
+				LED_ON;
+				Wait_ms(250);
+				LED_OFF;
+
+				main_state =  CHECK_EVENTS;
 				break;
 
 			case SLEEPING:

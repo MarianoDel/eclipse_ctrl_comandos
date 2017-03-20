@@ -169,6 +169,7 @@ inline void RecvCode16Reset (void)
 
 //Recibe el codigo de hasta 2 bytes (16bits), c es codigo, bits a enviar
 //contesta RESP_CONTINUE si falta o RESP_OK si termino RESP_NOK en error
+//contesta RESP_TIMEOUT si nunca le llego nada
 unsigned char RecvCode16 (unsigned short * code, unsigned char * bits)
 {
 	RspMessages resp = RESP_CONTINUE;
@@ -177,29 +178,44 @@ unsigned char RecvCode16 (unsigned short * code, unsigned char * bits)
 	switch (recv_state)
 	{
 		case C_RXINIT:
-			recv_state = C_RXWAIT_PILOT_A;
+			recv_state = C_RXINIT_PULLUP;
 			TIM16->CNT = 0;
 			TIM16Enable();
 			RX_CODE_PLLUP_ON;
-			bits_c = 0;
+			bits_c = 0;			//lo uso como timeout counter
 			RX_EN_ON;
+			break;
+
+		case C_RXINIT_PULLUP:
+			//espera transciciones
+			if (TIM16->CNT > 200)	//200us de espera para activacion pullup
+			{
+				recv_state = C_RXWAIT_PILOT_A;
+			}
 			break;
 
 		case C_RXWAIT_PILOT_A:
 			//espera transciciones
 			if (TIM16->CNT > 60000)	//pasaron 60 msegs sin nada
-				resp = RESP_NOK;
+			{
+				if (bits_c < 100)
+					bits_c++;
+				else
+					recv_state = C_RXTIMEOUT;
+			}
+
 
 			if (!RX_CODE)	//tengo transicion inicio pilot
 			{
 				recv_state = C_RXWAIT_PILOT_B;
 				TIM16->CNT = 0;
+				bits_c = 0;
 			}
 			break;
 
 		case C_RXWAIT_PILOT_B:
 			if (TIM16->CNT > 3000)	//pasaron 3mseg sin nada
-				resp = RESP_NOK;
+				recv_state = C_RXERROR;
 
 			if (RX_CODE)	//tengo pilot y primera transicion bits
 			{
@@ -216,9 +232,9 @@ unsigned char RecvCode16 (unsigned short * code, unsigned char * bits)
 			{
 				bits_c >>= 1;
 				if (bits_c == 12)
-					resp = RESP_OK;
+					recv_state = C_RXOK;
 				else
-					resp = RESP_NOK;
+					recv_state = C_RXERROR;
 			}
 
 
@@ -234,7 +250,7 @@ unsigned char RecvCode16 (unsigned short * code, unsigned char * bits)
 		case C_RXWAIT_BITS_C:
 			//tercera transcicion de bit, primera del proximo
 			if (TIM16->CNT > 3000)	//pasaron 3mseg sin nada
-				resp = RESP_NOK;
+				recv_state = C_RXERROR;
 
 			if (RX_CODE)	//tengo segunda transcicion bit y primera del proximo
 			{
@@ -245,8 +261,27 @@ unsigned char RecvCode16 (unsigned short * code, unsigned char * bits)
 			}
 			break;
 
+		case C_RXERROR:
+			//termine recepcion con error
+			RX_CODE_PLLUP_OFF;
+			RX_EN_OFF;
+			resp = RESP_NOK;
+			break;
+
+		case C_RXOK:
+			RX_CODE_PLLUP_OFF;
+			RX_EN_OFF;
+			resp = RESP_OK;
+			break;
+
+		case C_RXTIMEOUT:
+			RX_CODE_PLLUP_OFF;
+			RX_EN_OFF;
+			resp = RESP_TIMEOUT;
+			break;
+
 		default:
-			send_state = C_RXINIT;
+			recv_state = C_RXINIT;
 			break;
 	}
 	return resp;
