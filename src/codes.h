@@ -34,6 +34,9 @@ enum {
 enum {
 	C_RXINIT = 0,
 	C_RXWAIT_PILOT_A,
+	C_RXWAIT_PILOT_B,
+	C_RXWAIT_BITS_B,
+	C_RXWAIT_BITS_C,
 	C_RXFINISH
 
 } typedef CodeStateRX;
