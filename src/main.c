@@ -245,17 +245,17 @@ int main(void)
 				break;
 
 			case RX_S1_NOK:
-				for (i = 0; i < 2; i++)
-				{
-					LED_ON;
-					Wait_ms(250);
-					LED_OFF;
-					Wait_ms(250);
-				}
-
-				main_state =  CHECK_EVENTS;
-
-				break;
+//				for (i = 0; i < 2; i++)
+//				{
+//					LED_ON;
+//					Wait_ms(250);
+//					LED_OFF;
+//					Wait_ms(250);
+//				}
+//
+//				main_state =  CHECK_EVENTS;
+//
+//				break;
 
 			case RX_S1_TO:
 

@@ -174,7 +174,6 @@ unsigned char RecvCode16 (unsigned short * code, unsigned char * bits)
 {
 	RspMessages resp = RESP_CONTINUE;
 
-
 	switch (recv_state)
 	{
 		case C_RXINIT:
@@ -238,8 +237,8 @@ unsigned char RecvCode16 (unsigned short * code, unsigned char * bits)
 					recv_state = C_RXOK;
 				else
 					recv_state = C_RXERROR;
-			}
 
+			}
 
 			if (!RX_CODE)	//tengo segunda transcicion bit
 			{
