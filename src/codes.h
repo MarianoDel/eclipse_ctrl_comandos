@@ -16,6 +16,7 @@
 #define SIZEOF_BUFF_TRANS	64
 
 
+
 #define		DEFAULT_LAMBDA		540		//en us
 //Code States
 enum {
@@ -41,15 +42,15 @@ enum {
 	C_RXWAIT_BITS_B,
 	C_RXWAIT_BITS_C,
 	C_RXERROR,
-	C_RXOK,
-	C_RXTIMEOUT
+	C_RXOK
 
 } typedef CodeStateRX;
 
 //--- Funciones del Modulo ---
 unsigned char SendCode16 (unsigned short, unsigned char);
 void SendCode16Reset (void);
-unsigned char RecvCode16 (unsigned short *, unsigned char *);
+unsigned char RecvCode16 (unsigned char *);
 void RecvCode16Reset (void);
+unsigned char UpdateTransitions (unsigned char, unsigned short *, unsigned short *);
 
 #endif /* CODES_H_ */

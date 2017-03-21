@@ -60,6 +60,8 @@ volatile unsigned short timer_led_error = 0;
 #define TIM_BIP_LONG	800
 #define TT_TO_FREE_ERROR	5000
 
+#define TT_RXCODE			6000
+
 
 
 
@@ -86,6 +88,7 @@ int main(void)
 	unsigned char repeat;
 	unsigned short rxcode = 0;
 	unsigned char rxbits = 0;
+	unsigned short rxlambda = 0;
 
 	//!< At this stage the microcontroller clock setting is already configured,
     //   this is done through SystemInit() function which is called from startup
@@ -207,55 +210,65 @@ int main(void)
 			case RX_S1:
 				RecvCode16Reset();
 				main_state = RX_S1_A;
+				timer_standby = TT_RXCODE;
 
 				break;
 
 			case RX_S1_A:
-				resp = RecvCode16(&rxcode, &rxbits);
+				resp = RecvCode16(&rxbits);
 
 				if (resp == RESP_OK)
 				{
+					RecvCode16Reset();
 					main_state = RX_S1_OK;
 				}
 
 				if (resp == RESP_NOK)
 				{
-					//RecvCode16Reset();		//cuantas veces????
+					RecvCode16Reset();		//cuantas veces????
 					main_state = RX_S1_NOK;
 				}
 
-				if (resp == RESP_TIMEOUT)
+				if (!timer_standby)
 				{
+					RecvCode16Reset();
 					main_state = RX_S1_TO;
 				}
-
 				break;
 
 			case RX_S1_OK:
-				for (i = 0; i < 6; i++)
+				resp = UpdateTransitions (rxbits, &rxcode, &rxlambda);
+
+				if (resp == RESP_OK)
+				{
+					for (i = 0; i < 6; i++)
+					{
+						LED_ON;
+						Wait_ms(150);
+						LED_OFF;
+						Wait_ms(150);
+					}
+
+					main_state =  CHECK_EVENTS;
+				}
+				else
 				{
 					LED_ON;
-					Wait_ms(250);
+					Wait_ms(20);
 					LED_OFF;
-					Wait_ms(250);
-				}
 
-				main_state =  CHECK_EVENTS;
+					main_state = RX_S1_A;
+				}
 
 				break;
 
 			case RX_S1_NOK:
-//				for (i = 0; i < 2; i++)
-//				{
-//					LED_ON;
-//					Wait_ms(250);
-//					LED_OFF;
-//					Wait_ms(250);
-//				}
-//
-//				main_state =  CHECK_EVENTS;
-//
-//				break;
+				LED_ON;
+				Wait_ms(20);
+				LED_OFF;
+
+				main_state = RX_S1_A;
+				break;
 
 			case RX_S1_TO:
 

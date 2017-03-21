@@ -164,13 +164,17 @@ inline void SendCode16Reset (void)
 //resetea la SM de RecvCode
 inline void RecvCode16Reset (void)
 {
+	RX_CODE_PLLUP_OFF;
+	RX_EN_OFF;
+	TIM16Disable();
+
 	recv_state = C_RXINIT;
 }
 
-//Recibe el codigo de hasta 2 bytes (16bits), c es codigo, bits a enviar
+//Recibe puntero a cantidad de bits; por ahora sale ok solo con 12 BITS
 //contesta RESP_CONTINUE si falta o RESP_OK si termino RESP_NOK en error
 //contesta RESP_TIMEOUT si nunca le llego nada
-unsigned char RecvCode16 (unsigned short * code, unsigned char * bits)
+unsigned char RecvCode16 (unsigned char * bits)
 {
 	RspMessages resp = RESP_CONTINUE;
 
@@ -182,7 +186,7 @@ unsigned char RecvCode16 (unsigned short * code, unsigned char * bits)
 			TIM16Enable();
 			RX_CODE_PLLUP_ON;
 			RX_EN_ON;
-			bits_c = 0;			//lo uso como timeout counter
+			bits_c = 0;
 			break;
 
 		case C_RXINIT_PULLUP:
@@ -195,16 +199,6 @@ unsigned char RecvCode16 (unsigned short * code, unsigned char * bits)
 
 		case C_RXWAIT_PILOT_A:
 			//espera transciciones
-			if (TIM16->CNT > 60000)	//pasaron 60 msegs sin nada
-			{
-				if (bits_c < 100)
-				{
-					bits_c++;
-					TIM16->CNT = 0;
-				}
-				else
-					recv_state = C_RXTIMEOUT;
-			}
 
 			if (!RX_CODE)	//tengo transicion inicio pilot
 			{
@@ -279,24 +273,12 @@ unsigned char RecvCode16 (unsigned short * code, unsigned char * bits)
 
 		case C_RXERROR:
 			//termine recepcion con error
-			RX_CODE_PLLUP_OFF;
-			RX_EN_OFF;
-			TIM16Disable();
 			resp = RESP_NOK;
 			break;
 
 		case C_RXOK:
-			RX_CODE_PLLUP_OFF;
-			RX_EN_OFF;
-			TIM16Disable();
 			resp = RESP_OK;
-			break;
-
-		case C_RXTIMEOUT:
-			RX_CODE_PLLUP_OFF;
-			RX_EN_OFF;
-			TIM16Disable();
-			resp = RESP_TIMEOUT;
+			*bits = bits_c;
 			break;
 
 		default:
@@ -305,3 +287,58 @@ unsigned char RecvCode16 (unsigned short * code, unsigned char * bits)
 	}
 	return resp;
 }
+
+//Recibe cantidad de bits
+//contesta con punteros a codigo, lambda rx
+//contesta con RESP_OK o RESP_NOK si valida el codigo
+unsigned char UpdateTransitions (unsigned char bits, unsigned short * rxcode, unsigned short * lambda)
+{
+	RspMessages resp = RESP_OK;
+	unsigned char i;
+	unsigned char transitions;
+	unsigned char tot_lambda;
+	unsigned char bits_cnt = 0;
+	unsigned int tot_time = 0;
+	unsigned short lambda15;
+
+	*rxcode = 0;
+	//tengo 2 transiciones por bit
+	transitions = bits * 2;
+	for (i = 0; i < transitions; i++)
+		tot_time += bits_t[i + 1];		//todas las transciones sin el pilot
+
+	tot_lambda = bits * 3;
+	*lambda = tot_time / tot_lambda;
+	lambda15 = *lambda * 3;
+	lambda15 >>= 1;
+
+	for (i = 0; i < transitions; i += 2)
+	{
+		//veo si es 0
+		if ((bits_t[i + 1] < lambda15) && (bits_t[i + 2] > lambda15))
+		{
+			*rxcode &= 0xFFFE;
+			*rxcode <<= 1;
+			bits_cnt++;
+		}
+		//veo si es 1
+		else if ((bits_t[i + 1] > lambda15) && (bits_t[i + 2] < lambda15))
+		{
+			*rxcode |= 1;
+			*rxcode <<= 1;
+			bits_cnt++;
+		}
+		//es un error
+		else
+		{
+			i = transitions;
+			resp = RESP_NOK;
+		}
+	}
+
+	if (bits_cnt != bits)
+		resp = RESP_NOK;
+
+	return resp;
+}
+
