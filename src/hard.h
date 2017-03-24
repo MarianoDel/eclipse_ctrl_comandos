@@ -88,6 +88,7 @@ enum {
 	RX_S1_OK,
 	RX_S1_TO,
 	RX_S1_NOK,
+	SAVE_PARAMS,
 	SLEEPING
 
 } typedef MainStates;

@@ -23,6 +23,8 @@
 #include "pwr.h"
 #include "codes.h"
 
+#include "flash_program.h"
+
 //#include <stdio.h>
 //#include <string.h>
 
@@ -33,6 +35,8 @@ volatile unsigned char timer_1seg = 0;
 volatile unsigned short timer_led_comm = 0;
 volatile unsigned short wait_ms_var = 0;
 volatile unsigned char seq_ready = 0;
+
+parameters_typedef param_struct;
 
 //para pruebas int
 //volatile unsigned char led = 0;
@@ -137,6 +141,14 @@ int main(void)
 
 		Wait_ms(300);
 	}
+
+	//cargo las variables desde la memoria
+	param_struct.bits_button_one = ((parameters_typedef *) (unsigned int *) PAGE31)->bits_button_one;
+	param_struct.code_button_one = ((parameters_typedef *) (unsigned int *) PAGE31)->code_button_one;
+	param_struct.lambda_button_one = ((parameters_typedef *) (unsigned int *) PAGE31)->lambda_button_one;
+
+	rxcode = param_struct.code_button_one;
+	rxbits = 12;
 
 	timer_for_stop = TIMER_SLEEP;
 
@@ -254,7 +266,7 @@ int main(void)
 						Wait_ms(150);
 					}
 
-					main_state =  CHECK_EVENTS;
+					main_state =  SAVE_PARAMS;
 				}
 				else
 				{
@@ -280,6 +292,18 @@ int main(void)
 				LED_ON;
 				Wait_ms(250);
 				LED_OFF;
+
+				main_state =  CHECK_EVENTS;
+				break;
+
+			case SAVE_PARAMS:
+				//grabado
+				//hago update de memoria y grabo
+				param_struct.bits_button_one = rxbits;
+				param_struct.code_button_one = rxcode;
+				param_struct.lambda_button_one = rxlambda;
+
+				WriteConfigurations ();
 
 				main_state =  CHECK_EVENTS;
 				break;

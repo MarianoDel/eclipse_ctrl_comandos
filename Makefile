@@ -112,7 +112,7 @@ SRC += .\src\dsp.c
 SRC += .\src\pwr.c
 SRC += .\src\codes.c
 #SRC += .\src\stm32f0x_uart.c
-#SRC += .\src\flash_program.c
+SRC += .\src\flash_program.c
 #SRC += .\src\programs_functions.c
 ## System Support
 #SRC += .\cmsis_boot\system_stm32f0xx.c
