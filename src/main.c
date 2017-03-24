@@ -200,7 +200,12 @@ int main(void)
 				break;
 
 			case TX_S2_A:
-				resp = SendCode16(0x0550, 12);
+				if (rxbits)
+					resp = SendCode16(rxcode, rxbits);
+					//resp = SendCode16(rxcode, 12);
+				else
+					resp = SendCode16(0x0555, 12);
+					//resp = SendCode16(0x0555, 12);
 
 				if (resp != RESP_CONTINUE)
 					main_state = TX_S2;
@@ -263,9 +268,9 @@ int main(void)
 				break;
 
 			case RX_S1_NOK:
-				LED_ON;
-				Wait_ms(20);
-				LED_OFF;
+//				LED_ON;
+//				Wait_ms(20);
+//				LED_OFF;
 
 				main_state = RX_S1_A;
 				break;

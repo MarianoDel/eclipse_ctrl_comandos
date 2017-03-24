@@ -274,6 +274,7 @@ unsigned char RecvCode16 (unsigned char * bits)
 		case C_RXERROR:
 			//termine recepcion con error
 			resp = RESP_NOK;
+			*bits = 0;
 			break;
 
 		case C_RXOK:
@@ -290,14 +291,13 @@ unsigned char RecvCode16 (unsigned char * bits)
 
 //Recibe cantidad de bits
 //contesta con punteros a codigo, lambda rx
-//contesta con RESP_OK o RESP_NOK si valida el codigo
+//contesta con RESP_OK o RESP_NOK cuando valida el codigo
 unsigned char UpdateTransitions (unsigned char bits, unsigned short * rxcode, unsigned short * lambda)
 {
 	RspMessages resp = RESP_OK;
 	unsigned char i;
 	unsigned char transitions;
 	unsigned char tot_lambda;
-	unsigned char bits_cnt = 0;
 	unsigned int tot_time = 0;
 	unsigned short lambda15;
 
@@ -312,21 +312,25 @@ unsigned char UpdateTransitions (unsigned char bits, unsigned short * rxcode, un
 	lambda15 = *lambda * 3;
 	lambda15 >>= 1;
 
+	//compenso offset de bits
+	bits -= 1;
 	for (i = 0; i < transitions; i += 2)
 	{
 		//veo si es 0
 		if ((bits_t[i + 1] < lambda15) && (bits_t[i + 2] > lambda15))
 		{
 			*rxcode &= 0xFFFE;
-			*rxcode <<= 1;
-			bits_cnt++;
+			if (bits)
+				*rxcode <<= 1;
+			bits--;
 		}
 		//veo si es 1
 		else if ((bits_t[i + 1] > lambda15) && (bits_t[i + 2] < lambda15))
 		{
 			*rxcode |= 1;
-			*rxcode <<= 1;
-			bits_cnt++;
+			if (bits)
+				*rxcode <<= 1;
+			bits--;
 		}
 		//es un error
 		else
@@ -335,9 +339,6 @@ unsigned char UpdateTransitions (unsigned char bits, unsigned short * rxcode, un
 			resp = RESP_NOK;
 		}
 	}
-
-	if (bits_cnt != bits)
-		resp = RESP_NOK;
 
 	return resp;
 }
