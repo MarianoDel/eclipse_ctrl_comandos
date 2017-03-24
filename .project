@@ -26,6 +26,11 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>Includes</name>
+			<type>2</type>
+			<location>C:/Program Files (x86)/GNU Tools ARM Embedded/4.7 2013q2/arm-none-eabi/include</location>
+		</link>
+		<link>
 			<name>STM32F0xx_StdPeriph_Driver</name>
 			<type>2</type>
 			<location>C:/Users/Mariano/Documents/Proyectos/eclipse_stm32/STM32F0xx_StdPeriph_Lib_V1.3.1/Libraries/STM32F0xx_StdPeriph_Driver</location>

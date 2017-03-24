@@ -29,37 +29,23 @@
 //#include <string.h>
 
 
-//--- VARIABLES EXTERNAS ---//
+/* Externals variables ---------------------------------------------------------*/
 volatile unsigned char timer_1seg = 0;
-
-volatile unsigned short timer_led_comm = 0;
 volatile unsigned short wait_ms_var = 0;
-volatile unsigned char seq_ready = 0;
-
 parameters_typedef param_struct;
+volatile unsigned short timer_tick = 0;
 
-//para pruebas int
-//volatile unsigned char led = 0;
 
 //--- VARIABLES GLOBALES ---//
 
 // ------- de los timers -------
 volatile unsigned short timer_standby;
-volatile unsigned char filter_timer;
 volatile unsigned short timer_for_stop;
 
 // ------- de los switches -------
 volatile unsigned short switches_timer;
 volatile unsigned char s1, s2;
 
-volatile unsigned char door_filter;
-volatile unsigned char take_sample;
-volatile unsigned char move_relay;
-
-volatile unsigned char secs = 0;
-volatile unsigned short minutes = 0;
-
-volatile unsigned short timer_led_error = 0;
 #define TIM_BIP_SHORT	300
 #define TIM_BIP_LONG	800
 #define TT_TO_FREE_ERROR	5000
@@ -93,6 +79,7 @@ int main(void)
 	unsigned short rxcode = 0;
 	unsigned char rxbits = 0;
 	unsigned short rxlambda = 0;
+
 
 	//!< At this stage the microcontroller clock setting is already configured,
     //   this is done through SystemInit() function which is called from startup
@@ -151,6 +138,8 @@ int main(void)
 	rxbits = 12;
 
 	timer_for_stop = TIMER_SLEEP;
+
+	RandomGen(timer_tick);
 
 	//--- Main loop ---//
 	while(1)
@@ -423,21 +412,8 @@ void TimingDelay_Decrement(void)
 	if (timer_for_stop)
 		timer_for_stop--;
 
-	if (timer_led_error)
-		timer_led_error--;
-	/*
-	//cuenta 1 segundo
-	if (button_timer_internal)
-		button_timer_internal--;
-	else
-	{
-		if (button_timer)
-		{
-			button_timer--;
-			button_timer_internal = 1000;
-		}
-	}
-	*/
+	timer_tick++;
+
 }
 
 

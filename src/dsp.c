@@ -7,6 +7,28 @@
 
 #include "dsp.h"
 
+
+#include <stdlib.h>
+#include <math.h>
+
+
+/* Externals variables ---------------------------------------------------------*/
+
+
+
+/* Module functions ---------------------------------------------------------*/
+
+unsigned short RandomGen (unsigned int seed)
+{
+	unsigned int random;
+
+	//Random Generator
+	srand (seed);
+	random = rand();
+
+	return (unsigned short) random;
+
+}
 unsigned short MAFilterFast (unsigned short new_sample, unsigned short * vsample)
 {
 	unsigned short total_ma;

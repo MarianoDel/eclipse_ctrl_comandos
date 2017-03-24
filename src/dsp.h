@@ -8,7 +8,7 @@
 #ifndef DSP_H_
 #define DSP_H_
 
-
+unsigned short RandomGen (unsigned int);
 unsigned char MAFilter (unsigned char, unsigned char *);
 unsigned short MAFilterFast (unsigned short ,unsigned short *);
 unsigned short MAFilter8 (unsigned short, unsigned short *);
