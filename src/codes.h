@@ -47,7 +47,7 @@ enum {
 } typedef CodeStateRX;
 
 //--- Funciones del Modulo ---
-unsigned char SendCode16 (unsigned short, unsigned char);
+unsigned char SendCode16 (unsigned short, unsigned char, unsigned short);
 void SendCode16Reset (void);
 unsigned char RecvCode16 (unsigned char *);
 void RecvCode16Reset (void);

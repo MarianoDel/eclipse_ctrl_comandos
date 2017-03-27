@@ -79,15 +79,16 @@ enum
 //ESTADOS DEL PROGRAMA PRINCIPAL
 enum {
 	CHECK_EVENTS = 0,
-	TX_S1,
-	TX_S1_A,
-	TX_S2,
-	TX_S2_A,
-	RX_S1,
-	RX_S1_A,
-	RX_S1_OK,
-	RX_S1_TO,
-	RX_S1_NOK,
+	TX_S,
+	TX_S_A,
+	RX_WAIT_BUTTON,
+	RX_WAIT_BUTTON_B,
+	RX_WAIT_BUTTON_C,
+	RX_S,
+	RX_S_A,
+	RX_S_OK,
+	RX_S_TO,
+	RX_S_NOK,
 	SAVE_PARAMS,
 	SLEEPING
 
@@ -98,10 +99,10 @@ enum {
 
 #define SWITCHES_ROOF			400
 #define SWITCHES_THRESHOLD_FULL	300		//3 segundos
-#define SWITCHES_THRESHOLD_HALF	100		//1 segundo
+#define SWITCHES_THRESHOLD_HALF	10		//1 segundo
 #define SWITCHES_THRESHOLD_MIN	5		//50 ms
 
-#define TIMER_SLEEP			80		//80ms
+#define TIMER_SLEEP			200		//200ms
 #define TIMER_FOR_SAVE		4000	//4 segundos
 
 #define S_FULL		10

@@ -52,6 +52,9 @@ volatile unsigned char s1, s2;
 
 #define TT_RXCODE			6000
 
+#define SAVE_S1		1
+#define SAVE_S2		2
+
 
 
 
@@ -79,6 +82,7 @@ int main(void)
 	unsigned short rxcode = 0;
 	unsigned char rxbits = 0;
 	unsigned short rxlambda = 0;
+
 
 
 	//!< At this stage the microcontroller clock setting is already configured,
@@ -134,8 +138,9 @@ int main(void)
 	param_struct.code_button_one = ((parameters_typedef *) (unsigned int *) PAGE31)->code_button_one;
 	param_struct.lambda_button_one = ((parameters_typedef *) (unsigned int *) PAGE31)->lambda_button_one;
 
-	rxcode = param_struct.code_button_one;
-	rxbits = 12;
+	param_struct.bits_button_two = ((parameters_typedef *) (unsigned int *) PAGE31)->bits_button_two;
+	param_struct.code_button_two = ((parameters_typedef *) (unsigned int *) PAGE31)->code_button_two;
+	param_struct.lambda_button_two = ((parameters_typedef *) (unsigned int *) PAGE31)->lambda_button_two;
 
 	timer_for_stop = TIMER_SLEEP;
 
@@ -147,16 +152,30 @@ int main(void)
 		switch (main_state)
 		{
 			case CHECK_EVENTS:
-				if (CheckS1())
+				if ((CheckS1() >= S_HALF) && (!CheckS2()))
 				{
 					repeat = REPEAT_CODES;
-					main_state = RX_S1;
+					main_state = TX_S;
+
+					rxcode = param_struct.code_button_one;
+					rxbits = param_struct.bits_button_one;
+					rxlambda = param_struct.lambda_button_one;
 				}
 
-				if (CheckS2())
+				if ((CheckS2() >= S_HALF) && (!CheckS1()))
 				{
 					repeat = REPEAT_CODES;
-					main_state = TX_S2;
+					main_state = TX_S;
+
+					rxcode = param_struct.code_button_two;
+					rxbits = param_struct.bits_button_two;
+					rxlambda = param_struct.lambda_button_two;
+				}
+
+				if ((CheckS1()) && (CheckS2()))
+				{
+					timer_standby = 1000;
+					main_state = RX_WAIT_BUTTON;
 				}
 
 				if (!timer_for_stop)
@@ -164,12 +183,12 @@ int main(void)
 
 				break;
 
-			case TX_S1:
+			case TX_S:
 				if (repeat)
 				{
 					repeat--;
 					SendCode16Reset();
-					main_state = TX_S1_A;
+					main_state = TX_S_A;
 				}
 				else
 				{
@@ -178,71 +197,116 @@ int main(void)
 				}
 				break;
 
-			case TX_S1_A:
-				resp = SendCode16(0x0550, 12);
-
-				if (resp != RESP_CONTINUE)
-					main_state = TX_S1;
-
-				break;
-
-			case TX_S2:
-				if (repeat)
-				{
-					repeat--;
-					SendCode16Reset();
-					main_state = TX_S2_A;
-				}
-				else
-				{
-					timer_for_stop = TIMER_SLEEP;
-					main_state = CHECK_EVENTS;
-				}
-				break;
-
-			case TX_S2_A:
-				if (rxbits)
-					resp = SendCode16(rxcode, rxbits);
+			case TX_S_A:
+				if ((rxbits != 0) && (rxbits < 0xFF))
+					resp = SendCode16(rxcode, rxbits, rxlambda);
 					//resp = SendCode16(rxcode, 12);
 				else
-					resp = SendCode16(0x0555, 12);
+					resp = SendCode16(0x0555, 12, DEFAULT_LAMBDA);
 					//resp = SendCode16(0x0555, 12);
 
 				if (resp != RESP_CONTINUE)
-					main_state = TX_S2;
+					main_state = TX_S;
 
 				break;
 
-			case RX_S1:
-				RecvCode16Reset();
-				main_state = RX_S1_A;
-				timer_standby = TT_RXCODE;
-
+			case RX_WAIT_BUTTON:
+				if (!timer_standby)
+				{
+					if ((CheckS1()) && (CheckS2()))
+					{
+						LED_ON;
+						timer_standby = 6000;
+						main_state = RX_WAIT_BUTTON_B;
+					}
+					else
+						main_state = CHECK_EVENTS;
+				}
 				break;
 
-			case RX_S1_A:
+			case RX_WAIT_BUTTON_B:
+				if (!(CheckS1()) && (!CheckS2()))
+				{
+					LED_OFF;
+					timer_standby = 6000;
+					repeat = 0;		//en repeat voy a decir el boton a grabar
+					main_state = RX_WAIT_BUTTON_C;
+				}
+
+				//agoto timer para grabar
+				if (!timer_standby)
+				{
+					main_state = CHECK_EVENTS;
+					LED_OFF;
+				}
+				break;
+
+			case RX_WAIT_BUTTON_C:
+				//en repeat voy a decir el boton a grabar
+				if (CheckS1())
+					repeat = SAVE_S1;
+
+				if (CheckS2())
+					repeat = SAVE_S2;
+
+				//blink de led con timer_for_stop
+				if (!timer_for_stop)
+				{
+					if (LED)
+						LED_OFF;
+					else
+						LED_ON;
+					timer_for_stop = 150;
+				}
+
+				//agoto timer para grabar
+				if (!timer_standby)
+				{
+					main_state = CHECK_EVENTS;
+					LED_OFF;
+				}
+
+				if (repeat)		//tengo algo que grabar
+				{
+					LED_ON;
+					timer_standby = 1000;
+					main_state = RX_S;
+				}
+				break;
+
+			case RX_S:
+				if (!timer_standby)
+				{
+					LED_OFF;
+					RecvCode16Reset();
+					main_state = RX_S_A;
+					timer_standby = TT_RXCODE;
+				}
+				break;
+
+			case RX_S_A:
 				resp = RecvCode16(&rxbits);
 
 				if (resp == RESP_OK)
 				{
 					RecvCode16Reset();
-					main_state = RX_S1_OK;
+					main_state = RX_S_OK;
 				}
 
 				if (resp == RESP_NOK)
 				{
 					RecvCode16Reset();		//cuantas veces????
-					main_state = RX_S1_NOK;
+					main_state = RX_S_NOK;
 				}
 
 				if (!timer_standby)
 				{
 					RecvCode16Reset();
-					main_state = RX_S1_TO;
+					main_state = RX_S_TO;
 				}
 				break;
 
-			case RX_S1_OK:
+			case RX_S_OK:
 				resp = UpdateTransitions (rxbits, &rxcode, &rxlambda);
 
 				if (resp == RESP_OK)
@@ -263,20 +327,20 @@ int main(void)
 					Wait_ms(20);
 					LED_OFF;
 
-					main_state = RX_S1_A;
+					main_state = RX_S_A;
 				}
 
 				break;
 
-			case RX_S1_NOK:
+			case RX_S_NOK:
 //				LED_ON;
 //				Wait_ms(20);
 //				LED_OFF;
 
-				main_state = RX_S1_A;
+				main_state = RX_S_A;
 				break;
 
-			case RX_S1_TO:
+			case RX_S_TO:
 
 				LED_ON;
 				Wait_ms(250);
@@ -288,9 +352,19 @@ int main(void)
 			case SAVE_PARAMS:
 				//grabado
 				//hago update de memoria y grabo
-				param_struct.bits_button_one = rxbits;
-				param_struct.code_button_one = rxcode;
-				param_struct.lambda_button_one = rxlambda;
+				if (repeat == SAVE_S1)
+				{
+					param_struct.bits_button_one = rxbits;
+					param_struct.code_button_one = rxcode;
+					param_struct.lambda_button_one = rxlambda;
+				}
+
+				if (repeat == SAVE_S2)
+				{
+					param_struct.bits_button_two = rxbits;
+					param_struct.code_button_two = rxcode;
+					param_struct.lambda_button_two = rxlambda;
+				}
 
 				WriteConfigurations ();
 

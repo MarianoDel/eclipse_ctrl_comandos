@@ -29,7 +29,7 @@ unsigned char bits_c;
 
 //Envia el codigo de hasta 2 bytes (16bits), c es codigo, bits a enviar
 //contesta RESP_CONTINUE si falta o RESP_OK si termino RESP_NOK en error
-unsigned char SendCode16 (unsigned short code, unsigned char bits)
+unsigned char SendCode16 (unsigned short code, unsigned char bits, unsigned short def_lambda)
 {
 	RspMessages resp = RESP_CONTINUE;
 
@@ -45,7 +45,11 @@ unsigned char SendCode16 (unsigned short code, unsigned char bits)
 				bitmask = 1;
 				bitmask <<= bits;
 
-				lambda = DEFAULT_LAMBDA;
+				if (!def_lambda)
+					resp = RESP_NOK;
+				else
+					lambda = def_lambda;
+
 				send_state = C_SEND_PILOT_A;
 				TIM16->CNT = 0;
 				TIM16Enable();
@@ -127,8 +131,8 @@ unsigned char SendCode16 (unsigned short code, unsigned char bits)
 			break;
 
 		case C_SEND_ZERO_B:
-			//if (TIM16->CNT > (lambda))
-			if (TIM16->CNT > (360))
+			if (TIM16->CNT > (lambda))
+			//if (TIM16->CNT > (360))
 			{
 				TIM16->CNT = 0;
 				LED_ON;
@@ -138,8 +142,8 @@ unsigned char SendCode16 (unsigned short code, unsigned char bits)
 			break;
 
 		case C_SEND_ZERO_C:
-			//if (TIM16->CNT > (2*lambda))
-			if (TIM16->CNT > (1280))
+			if (TIM16->CNT > (2*lambda))
+			//if (TIM16->CNT > (1280))
 			{
 				TIM16->CNT = 0;
 				LED_OFF;
